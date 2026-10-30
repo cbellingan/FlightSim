@@ -434,7 +434,14 @@
     <!-- Presets -->
     <div class="section-title">
       <span>1. Select an Optimization Preset (or Fine-Tune Below)</span>
-      <span style="font-size: 0.8rem; color: var(--muted); font-weight: normal;">Click any preset to load its parameters</span>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size: 0.8rem; color: var(--muted);">GPU Hardware:</span>
+        <select id="gpu_filter" onchange="filterPresetsByGpu(this.value)" style="padding:4px 12px; background:#101726; border:1px solid #3b82f6; color:#60a5fa; font-weight:600; border-radius:6px; font-size:0.82rem; cursor:pointer;">
+          <option value="all">🌐 All Profiles</option>
+          <option value="rtx_5070ti">⚡ NVIDIA RTX 5070 Ti (16GB GDDR7)</option>
+          <option value="rtx_2070">💻 NVIDIA RTX 2070 (8GB)</option>
+        </select>
+      </div>
     </div>
     <div class="presets-grid" id="presets-container"></div>
 
@@ -894,6 +901,56 @@
       renderDashboard();
     }
 
+        let currentGpuFilter = 'all';
+
+    function filterPresetsByGpu(val) {
+      currentGpuFilter = val;
+      if (val === 'rtx_5070ti') {
+        selectedPresetId = 'quest_pro_rtx5070ti_ultra';
+      } else if (val === 'rtx_2070') {
+        selectedPresetId = 'quest_pro_sharp_text';
+      }
+      renderPresetCards();
+      if (appState && appState.presets && appState.presets[selectedPresetId]) {
+        selectPreset(selectedPresetId);
+      }
+    }
+
+    function renderPresetCards() {
+      const pContainer = document.getElementById('presets-container');
+      if (!pContainer || !appState || !appState.presets) return;
+      pContainer.innerHTML = '';
+
+      let list = Object.values(appState.presets);
+      if (currentGpuFilter === 'rtx_5070ti') {
+        list = list.filter(p => p.id.indexOf('5070ti') !== -1 || p.id === 'desktop_ultrawide');
+      } else if (currentGpuFilter === 'rtx_2070') {
+        list = list.filter(p => p.id.indexOf('5070ti') === -1);
+      }
+
+      list.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'preset-card' + (p.id === selectedPresetId ? ' active' : '');
+        div.onclick = () => selectPreset(p.id);
+        const ofxrBadge = (p.ofxr_settings && p.ofxr_settings.armed) ? '🟢 OFXR ON' : '⚪ OFXR OFF';
+        const is5070 = p.id.indexOf('5070ti') !== -1;
+        const badgeStyle = is5070 ? 'style="background:#1e3a8a; color:#93c5fd; border:1px solid #3b82f6;"' : '';
+        div.innerHTML = `
+          <div>
+            <div class="preset-top">
+              <div class="preset-name" ${is5070 ? 'style="color:#93c5fd; font-weight:700;"' : ''}>${p.name}</div>
+              <span class="badge" ${badgeStyle}>${p.badge}</span>
+            </div>
+            <div class="preset-desc">${p.description}</div>
+          </div>
+          <div style="font-size:0.76rem; color:var(--accent); font-weight:600;">
+            ${ofxrBadge} • FOV: ${p.quest_settings.fov_x}×${p.quest_settings.fov_y} • PPDP: ${p.quest_settings.ppdp}x • Link: ${p.quest_settings.bitrate_mbps || 325}Mbps
+          </div>
+        `;
+        pContainer.appendChild(div);
+      });
+    }
+
     function renderDashboard() {
       const q = appState.quest_status;
       const log = appState.log_analysis;
@@ -946,27 +1003,7 @@
       }
 
       // Render Presets
-      const pContainer = document.getElementById('presets-container');
-      pContainer.innerHTML = '';
-      Object.values(appState.presets).forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'preset-card' + (p.id === selectedPresetId ? ' active' : '');
-        div.onclick = () => selectPreset(p.id);
-        const ofxrBadge = (p.ofxr_settings && p.ofxr_settings.armed) ? '🟢 OFXR ON' : '⚪ OFXR OFF';
-        div.innerHTML = `
-          <div>
-            <div class="preset-top">
-              <div class="preset-name">${p.name}</div>
-              <span class="badge">${p.badge}</span>
-            </div>
-            <div class="preset-desc">${p.description}</div>
-          </div>
-          <div style="font-size:0.76rem; color:var(--accent); font-weight:600;">
-            ${ofxrBadge} • FOV: ${p.quest_settings.fov_x}×${p.quest_settings.fov_y} • PPDP: ${p.quest_settings.ppdp}x • Meta ASW: ${p.quest_settings.asw_mode}
-          </div>
-        `;
-        pContainer.appendChild(div);
-      });
+      renderPresetCards();
 
       // Render Backups
       const bList = document.getElementById('backup-list');
