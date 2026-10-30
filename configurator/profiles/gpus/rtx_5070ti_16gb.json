@@ -1,19 +1,45 @@
 {
   "id": "rtx_5070ti_16gb",
-  "name": "NVIDIA GeForce RTX 5070 Ti (16GB VRAM)",
+  "name": "NVIDIA GeForce RTX 5070 Ti (16GB GDDR7)",
   "category": "gpu",
   "vram_gb": 16,
+  "memory_type": "GDDR7",
   "optical_flow_supported": true,
   "optical_flow_preset": "high_quality",
+  "description": "Optimized for NVIDIA GeForce RTX 5070 Ti 16GB: maximum uncompressed textures, full dual-ring Optical Flow FrameGen (no VRAM truncation), 1.30x SuperSampling, 2x MSAA, maximum volumetric clouds, and 500Mbps link encode.",
+  "ofxr_bridge_tuning": {
+    "backend": 2,
+    "preset": 0,
+    "scale": 0,
+    "lower_vram": 0,
+    "triple_frame_gen": 0,
+    "overlay_position": 0,
+    "diagnostics": 1
+  },
+  "link_encoder_tuning": {
+    "encode_resolution_width": 4000,
+    "encode_bitrate_mbps": 500,
+    "video_codec": "h264",
+    "pixels_per_display_pixel": 1.30,
+    "distortion_curve": 1
+  },
   "xp_gpu_settings": {
+    "_tex_res": 5,
     "renopt_tex_res_04": 4,
     "vr_renopt_tex_res_04": 4,
+    "vr_renopt_MSAA": 1,
+    "vr_renopt_FXAA": 0,
+    "vr_renopt_FSR_04": 0,
+    "_rcas_ratio": 0.80,
+    "vr_renopt_ANISO": 16,
+    "vr_renopt_clouds_02": 3,
     "vr_renopt_shadow_quality_04": 2,
     "vr_renopt_draw_distance04": 3,
-    "vr_renopt_draw_3d_04": 3,
-    "vr_renopt_clouds_02": 3,
+    "vr_renopt_draw_3d_04": 2,
     "vr_renopt_vegetation_3d": 1,
     "vr_renopt_vegetation_quality_04": 3,
-    "vr_renopt_SSAO_04": 1
+    "vr_renopt_SSAO_04": 1,
+    "vr_renopt_boats": 1,
+    "vr_renopt_static_acf": 0
   }
 }

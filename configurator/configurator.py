@@ -147,6 +147,19 @@ def compose_profile(vr_id="quest_pro", gpu_id="rtx_2070_8gb", hw_id="i9_9900k_mo
         "diagnostics": 1,
     }
 
+    if "ofxr_bridge_tuning" in gpu_profile:
+        ofxr_settings.update(gpu_profile["ofxr_bridge_tuning"])
+    if "link_encoder_tuning" in gpu_profile:
+        let = gpu_profile["link_encoder_tuning"]
+        if "encode_bitrate_mbps" in let:
+            quest_settings["bitrate_mbps"] = let["encode_bitrate_mbps"]
+        if "encode_resolution_width" in let:
+            quest_settings["encode_width"] = let["encode_resolution_width"]
+        if "pixels_per_display_pixel" in let:
+            quest_settings["ppdp"] = let["pixels_per_display_pixel"]
+        if "video_codec" in let:
+            quest_settings["video_codec"] = let["video_codec"]
+
     window_settings = {
         "windowed_for_vr": True,
         "width": 1280,
@@ -175,6 +188,136 @@ def compose_profile(vr_id="quest_pro", gpu_id="rtx_2070_8gb", hw_id="i9_9900k_mo
 # Preset Profiles (Defaulting to Meta Quest Pro + OFXR-Bridge + Sharp Text)
 # ---------------------------------------------------------------------------
 PRESETS = {
+    "quest_pro_rtx5070ti_ultra": {
+        "id": "quest_pro_rtx5070ti_ultra",
+        "name": "Quest Pro + RTX 5070 Ti 16GB (Ultra High-Fidelity VR)",
+        "badge": "RTX 5070 Ti • Ultra VR • OFXR Max",
+        "description": (
+            "Engineered specifically for the NVIDIA GeForce RTX 5070 Ti (16GB GDDR7) with Meta Quest Pro: unlocks Maximum Textures, "
+            "16GB full-precision Optical Flow FrameGen (lower_vram=0, 100% native flow scale), 1.30x SuperSampling, 4000px encode width, "
+            "500Mbps bitrate, 2x MSAA, High Volumetric Clouds, Soft Shadows, SSAO, and 500-zone Mini-LED Local Dimming."
+        ),
+        "xp_settings": {
+            "_vr_separate_graphics_settings": 1,
+            "_vr_vrs_enable": 0,
+            "_vr_depth_reprojection": 1,
+            "_vr_runtime_id": "openxr",
+            "_rcas_ratio": 0.800000,
+            "_fms_per_frame": 2,
+            "_tex_res": 5,
+            "renopt_tex_res_04": 4,
+            "vr_renopt_tex_res_04": 4,
+            "vr_renopt_FSR_04": 0,
+            "vr_renopt_MSAA": 1,
+            "vr_renopt_FXAA": 0,
+            "vr_renopt_SSAO_04": 1,
+            "vr_renopt_clouds_02": 3,
+            "vr_renopt_shadow_quality_04": 2,
+            "vr_renopt_draw_distance04": 3,
+            "vr_renopt_draw_3d_04": 2,
+            "vr_renopt_vegetation_3d": 1,
+            "vr_renopt_vegetation_quality_04": 3,
+            "vr_renopt_ANISO": 16,
+            "vr_renopt_static_acf": 0,
+            "vr_renopt_boats": 1,
+        },
+        "window_settings": {
+            "windowed_for_vr": True,
+            "width": 1280,
+            "height": 720,
+        },
+        "quest_settings": {
+            "headset_target": "quest_pro",
+            "fov_x": 0.80,
+            "fov_y": 0.74,
+            "ppdp": 1.30,
+            "asw_mode": "Off",
+            "perf_hud": 0,
+            "bitrate_mbps": 500,
+            "encode_width": 4000,
+            "link_sharpening": 3,
+            "distortion_curve": 1,
+            "num_slices": 5,
+            "dynamic_bitrate": 0,
+            "video_codec": "h264",
+            "local_dimming": 1,
+        },
+        "ofxr_settings": {
+            "armed": True,
+            "backend": 2,
+            "preset": 0,
+            "scale": 0,
+            "lower_vram": 0,
+            "triple_frame_gen": 0,
+            "overlay_position": 0,
+            "diagnostics": 1,
+        },
+    },
+    "quest3_rtx5070ti_ultra": {
+        "id": "quest3_rtx5070ti_ultra",
+        "name": "Quest 3 + RTX 5070 Ti 16GB (Ultra High-Fidelity VR)",
+        "badge": "RTX 5070 Ti • Quest 3 4K • OFXR Max",
+        "description": (
+            "Engineered for RTX 5070 Ti (16GB) on Meta Quest 3: 1.25x SuperSampling on dual 2064x2208 LCD panels, "
+            "4128px encode width, 500Mbps bitrate, 16GB full-precision OFXR-Bridge FrameGen (lower_vram=0), "
+            "Maximum Textures, 2x MSAA, High Clouds & Shadows."
+        ),
+        "xp_settings": {
+            "_vr_separate_graphics_settings": 1,
+            "_vr_vrs_enable": 0,
+            "_vr_depth_reprojection": 1,
+            "_vr_runtime_id": "openxr",
+            "_rcas_ratio": 0.800000,
+            "_fms_per_frame": 2,
+            "_tex_res": 5,
+            "renopt_tex_res_04": 4,
+            "vr_renopt_tex_res_04": 4,
+            "vr_renopt_FSR_04": 0,
+            "vr_renopt_MSAA": 1,
+            "vr_renopt_FXAA": 0,
+            "vr_renopt_SSAO_04": 1,
+            "vr_renopt_clouds_02": 3,
+            "vr_renopt_shadow_quality_04": 2,
+            "vr_renopt_draw_distance04": 3,
+            "vr_renopt_draw_3d_04": 2,
+            "vr_renopt_vegetation_3d": 1,
+            "vr_renopt_vegetation_quality_04": 3,
+            "vr_renopt_ANISO": 16,
+            "vr_renopt_static_acf": 0,
+            "vr_renopt_boats": 1,
+        },
+        "window_settings": {
+            "windowed_for_vr": True,
+            "width": 1280,
+            "height": 720,
+        },
+        "quest_settings": {
+            "headset_target": "quest_3",
+            "fov_x": 0.90,
+            "fov_y": 0.90,
+            "ppdp": 1.25,
+            "asw_mode": "Off",
+            "perf_hud": 0,
+            "bitrate_mbps": 500,
+            "encode_width": 4128,
+            "link_sharpening": 3,
+            "distortion_curve": 1,
+            "num_slices": 5,
+            "dynamic_bitrate": 0,
+            "video_codec": "h264",
+            "local_dimming": 0,
+        },
+        "ofxr_settings": {
+            "armed": True,
+            "backend": 2,
+            "preset": 0,
+            "scale": 0,
+            "lower_vram": 0,
+            "triple_frame_gen": 0,
+            "overlay_position": 0,
+            "diagnostics": 1,
+        },
+    },
     "quest_pro_sharp_text": {
         "id": "quest_pro_sharp_text",
         "name": "Quest Pro Default — Razor-Sharp Text + OFXR-Bridge FrameGen",
