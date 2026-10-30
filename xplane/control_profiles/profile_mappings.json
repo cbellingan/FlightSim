@@ -1,0 +1,30 @@
+{
+  "description": "X-Plane 12 Aircraft to Joystick Control Profile Mappings",
+  "mappings": [
+    {
+      "aircraft_name": "Cessna Skyhawk",
+      "prf_key": "Cessna___Skyhawk",
+      "profile_name": "C172 - MOZA AY210",
+      "prf_value": "C172___-___MOZA___AY210",
+      "acf_paths": [
+        "Aircraft/Laminar Research/Cessna 172 SP/Cessna_172SP.acf",
+        "Aircraft/Laminar Research/Cessna 172 SP/Cessna_172SP_G1000.acf"
+      ]
+    },
+    {
+      "aircraft_name": "Cessna C152",
+      "prf_key": "Cessna___C152",
+      "profile_name": "C152 - MOZA AY210",
+      "prf_value": "C152___-___MOZA___AY210",
+      "acf_paths": [
+        "Aircraft/Just Flight/JF12_C152_v1.0/JF_C152.acf"
+      ]
+    }
+  ],
+  "miscellaneous_prf_entries": [
+    "P acf_profile Cessna___Skyhawk C172___-___MOZA___AY210",
+    "P acf_profile Cessna___C152 C152___-___MOZA___AY210",
+    "P acf_profile JF_C152 C152___-___MOZA___AY210",
+    "P acf_profile Cessna___152 C152___-___MOZA___AY210"
+  ]
+}

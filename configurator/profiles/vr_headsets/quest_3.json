@@ -1,0 +1,33 @@
+{
+  "id": "quest_3",
+  "name": "Meta Quest 3",
+  "category": "vr_headset",
+  "display": {
+    "panel": "2064x2208 per eye Dual LCD",
+    "refresh_rate_hz": 80,
+    "local_dimming": false,
+    "eye_tracking": false
+  },
+  "odt_settings": {
+    "pixels_per_display_pixel": 1.15,
+    "encode_resolution_width": 4000,
+    "encode_bitrate_mbps": 500,
+    "fov_tangent_multiplier": [0.90, 0.90],
+    "asw_mode": 0
+  },
+  "ofxr_bridge": {
+    "enabled": true,
+    "target_fps": 80,
+    "optical_flow_mode": "fast_low_vram",
+    "overlay": "off"
+  },
+  "xp_vr_overrides": {
+    "_vr_separate_graphics_settings": 1,
+    "_vr_vrs_enable": 0,
+    "_vr_depth_reprojection": 1,
+    "_rcas_ratio": 0.80,
+    "vr_renopt_FSR_04": 0,
+    "vr_renopt_FXAA": 0,
+    "vr_renopt_ANISO": 16
+  }
+}

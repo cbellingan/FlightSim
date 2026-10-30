@@ -1,0 +1,16 @@
+{
+  "id": "i9_9900k_moza_ay210",
+  "name": "Intel Core i9-9900K + MOZA AY210 FFB Yoke",
+  "category": "hardware",
+  "cpu": {
+    "model": "Intel Core i9-9900K",
+    "cores": 8,
+    "threads": 16,
+    "fms_per_frame": 2
+  },
+  "controls": {
+    "yoke": "MOZA AY210 Force Feedback",
+    "vid_pid": "VID:13422PID:4097",
+    "moza_telemetry_plugin": true
+  }
+}

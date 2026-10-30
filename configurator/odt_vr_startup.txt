@@ -1,0 +1,8 @@
+service set-client-fov-tan-angle-multiplier 0.80 0.74
+service set-use-fov-stencil true
+service set-pixels-per-display-pixel-override 1.25
+service set-force-mip-gen-on-all-layers true
+service set-offset-mip-bias-on-all-layers true
+server:asw.Off
+perfhud reset
+exit

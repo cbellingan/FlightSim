@@ -1,0 +1,19 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# X-Plane & Temporary backups
+*.bak
+backups/
+last_applied_profile.json
+configurator.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/

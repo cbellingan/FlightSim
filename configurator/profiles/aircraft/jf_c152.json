@@ -1,0 +1,17 @@
+{
+  "id": "jf_c152",
+  "name": "Cessna 152 (Just Flight / Thranda)",
+  "category": "aircraft",
+  "engine": "Lycoming O-235-L2C (110 HP)",
+  "poh_runup_rpm": 1700,
+  "magneto_drop_range_rpm": [65, 85],
+  "max_mag_differential_rpm": 50,
+  "xplane_profile": "C152 - MOZA AY210",
+  "moza_preset_uuid": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+  "switch_mappings": {
+    "moza_batt": "combined_alt_and_bat",
+    "moza_avionics": "pitot_heat_toggle",
+    "magneto_5pos": "direct_rotary_and_thranda_key1"
+  },
+  "pilot_mesh_suppressed": true
+}

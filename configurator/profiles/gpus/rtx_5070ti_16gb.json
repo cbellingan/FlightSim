@@ -1,0 +1,19 @@
+{
+  "id": "rtx_5070ti_16gb",
+  "name": "NVIDIA GeForce RTX 5070 Ti (16GB VRAM)",
+  "category": "gpu",
+  "vram_gb": 16,
+  "optical_flow_supported": true,
+  "optical_flow_preset": "high_quality",
+  "xp_gpu_settings": {
+    "renopt_tex_res_04": 4,
+    "vr_renopt_tex_res_04": 4,
+    "vr_renopt_shadow_quality_04": 2,
+    "vr_renopt_draw_distance04": 3,
+    "vr_renopt_draw_3d_04": 3,
+    "vr_renopt_clouds_02": 3,
+    "vr_renopt_vegetation_3d": 1,
+    "vr_renopt_vegetation_quality_04": 3,
+    "vr_renopt_SSAO_04": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "rtx_2070_8gb",
+  "name": "NVIDIA GeForce RTX 2070 (8GB VRAM)",
+  "category": "gpu",
+  "vram_gb": 8,
+  "optical_flow_supported": true,
+  "optical_flow_preset": "fast_low_vram",
+  "xp_gpu_settings": {
+    "renopt_tex_res_04": 3,
+    "vr_renopt_tex_res_04": 3,
+    "vr_renopt_shadow_quality_04": 0,
+    "vr_renopt_draw_distance04": 1,
+    "vr_renopt_draw_3d_04": 1,
+    "vr_renopt_clouds_02": 1,
+    "vr_renopt_vegetation_3d": 0,
+    "vr_renopt_vegetation_quality_04": 1,
+    "vr_renopt_SSAO_04": 0
+  }
+}

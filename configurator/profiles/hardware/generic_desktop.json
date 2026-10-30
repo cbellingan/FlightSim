@@ -1,0 +1,11 @@
+{
+  "id": "generic_desktop",
+  "name": "Standard Desktop / Non-FFB Hardware",
+  "category": "hardware",
+  "cpu": {
+    "fms_per_frame": 1
+  },
+  "controls": {
+    "moza_telemetry_plugin": false
+  }
+}

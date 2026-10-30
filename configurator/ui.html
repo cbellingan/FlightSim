@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X-Plane 12 + Meta Quest Pro VR Configurator</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --panel: #131b2b;
+      --panel-alt: #182338;
+      --border: #263554;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --success: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.5;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+    .brand p {
+      margin: 4px 0 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #090d16;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-success {
+      background: var(--success);
+      color: #052e16;
+      border-color: var(--success);
+    }
+    .btn-success:hover { filter: brightness(1.1); }
+    .btn-secondary {
+      background: var(--panel-alt);
+      color: var(--text);
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 22px 28px 60px;
+    }
+    .grid-top {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .stat-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-card .val {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .stat-card .sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .diag-banner {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+    .diag-banner.warn {
+      border-color: rgba(245, 158, 11, 0.5);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(19, 27, 43, 0.95) 100%);
+    }
+    .diag-banner.good {
+      border-color: rgba(34, 197, 94, 0.5);
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.12) 0%, rgba(19, 27, 43, 0.95) 100%);
+    }
+    .diag-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .diag-list {
+      margin: 6px 0 0 0;
+      padding-left: 20px;
+      font-size: 0.87rem;
+      color: #cbd5e1;
+    }
+    .diag-list li { margin-bottom: 4px; }
+
+    /* Telemetry Gauge Bar */
+    .estimator-bar {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      align-items: center;
+    }
+    .meter-wrap {
+      width: 100%;
+    }
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+    .meter-track {
+      height: 10px;
+      background: #0b0f17;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .meter-fill {
+      height: 100%;
+      transition: width 0.25s ease, background 0.25s ease;
+    }
+
+    /* Presets */
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+    .preset-card {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .preset-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .preset-card.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .preset-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .preset-name {
+      font-weight: 700;
+      font-size: 0.96rem;
+      color: #fff;
+    }
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--accent);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .preset-desc {
+      font-size: 0.81rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* Main 2-Column Settings */
+    .main-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 1024px) {
+      .main-cols { grid-template-columns: 1fr; }
+    }
+    .panel-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(38, 53, 84, 0.6);
+      gap: 12px;
+    }
+    .control-row:last-child { border-bottom: none; }
+    .control-info {
+      flex: 1;
+    }
+    .control-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .control-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .control-widget {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 190px;
+      justify-content: flex-end;
+    }
+    select, input[type="number"] {
+      background: #0b0f17;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.84rem;
+      width: 100%;
+    }
+    input[type="range"] {
+      accent-color: var(--accent);
+      width: 130px;
+    }
+    .range-val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 44px;
+      text-align: right;
+    }
+    .hud-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .hud-pill {
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      background: #0b0f17;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+    }
+    .hud-pill:hover, .hud-pill.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      border: 2px solid var(--accent);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      display: none;
+      z-index: 999;
+      max-width: 460px;
+      font-size: 0.86rem;
+    }
+    .backup-list {
+      max-height: 170px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .backup-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 10px;
+      background: #0b0f17;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>✈️ X-Plane 12 + Meta Quest Pro + OFXR-Bridge Configurator</h1>
+      <p>Default Headset: Meta Quest Pro (QLED + Local Dimming) • OFXR-Bridge 0.3.1 Optical Flow FrameGen • i9-9900K &amp; RTX 2070 (8 GB)</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" onclick="openODT()">🛠 Open Oculus Debug Tool</button>
+      <button class="btn-primary" onclick="applySettings()">💾 Apply &amp; Save Optimizations</button>
+      <button class="btn-success" onclick="launchXPlane()">🚀 Launch X-Plane 12 VR</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Hardware Summary Cards -->
+    <div class="grid-top">
+      <div class="stat-card">
+        <div class="label">Processor &amp; System Memory</div>
+        <div class="val" id="hw-cpu">Intel Core i9-9900K (8C/16T)</div>
+        <div class="sub" id="hw-ram">64 GB System RAM • Strong single-core prep</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Graphics Processor &amp; Optical Flow</div>
+        <div class="val" id="hw-gpu">NVIDIA GeForce RTX 2070 (8 GB)</div>
+        <div class="sub">Vulkan 1.3.280 • Turing NVOFA Hardware Optical Flow • 7.82 GB Heap</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Primary VR Headset (Default: Quest Pro)</div>
+        <div class="val" id="quest-title">Meta Quest Pro</div>
+        <div class="sub" id="quest-sub">Checking Link &amp; OpenXR status...</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">OFXR-Bridge 0.3.1 Frame Generation</div>
+        <div class="val" id="ofxr-title">OFXR-Bridge 0.3.1 (v681)</div>
+        <div class="sub" id="ofxr-sub">Checking OpenXR &amp; Vulkan layer status...</div>
+      </div>
+    </div>
+
+    <!-- Diagnostic Audit Banner -->
+    <div id="diag-banner" class="diag-banner warn">
+      <div class="diag-title" id="diag-heading">🔍 Analyzing X-Plane 12 Log.txt &amp; Preferences...</div>
+      <ul class="diag-list" id="diag-items"></ul>
+    </div>
+
+    <!-- Real-time VRAM & Pixel Throughput Estimator -->
+    <div class="estimator-bar">
+      <div class="meter-wrap">
+        <div class="meter-head">
+          <span><strong>Estimated VR VRAM Load</strong> (RTX 2070 8GB Heap)</span>
+          <span id="vram-label">6.1 / 7.8 GB (Safe)</span>
+        </div>
+        <div class="meter-track">
+          <div id="vram-bar" class="meter-fill" style="width: 75%; background: var(--success);"></div>
+        </div>
+      </div>
+      <div class="meter-wrap">
+        <div class="meter-head">
+          <span><strong>Effective Per-Eye Shaded Pixels</strong> (FOV Crop + FSR)</span>
+          <span id="pixel-label">1190 × 1255 / eye (-58% GPU load)</span>
+        </div>
+        <div class="meter-track">
+          <div id="pixel-bar" class="meter-fill" style="width: 45%; background: var(--accent);"></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size: 0.78rem; color: var(--muted);">Target VR Frame Pacing</div>
+        <div style="font-size: 0.96rem; font-weight: 700; color: #fff;" id="pacing-label">
+          45 FPS Locked → 90 Hz Depth ASW 2.0
+        </div>
+        <div style="font-size: 0.75rem; color: var(--muted);">22.2 ms frame budget (CPU + GPU balanced)</div>
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="section-title">
+      <span>1. Select an Optimization Preset (or Fine-Tune Below)</span>
+      <span style="font-size: 0.8rem; color: var(--muted); font-weight: normal;">Click any preset to load its parameters</span>
+    </div>
+    <div class="presets-grid" id="presets-container"></div>
+
+    <!-- 2-Column Detailed Controls -->
+    <div class="main-cols">
+      <!-- Left Column: X-Plane 12 VR Graphics -->
+      <div class="panel-box">
+        <div class="section-title">
+          <span>2. X-Plane 12 VR Graphics Profile (<code>X-Plane.prf</code>)</span>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Separate VR Graphics Settings (<code>_vr_separate_graphics_settings</code>)</div>
+            <div class="control-hint">CRITICAL: Was OFF (0) in your file, causing VR to use heavy 5K2K desktop settings!</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp__vr_separate_graphics_settings" onchange="recalc()">
+              <option value="1">Enabled (1) — Use Dedicated VR Profile</option>
+              <option value="0">Disabled (0) — Share Desktop Profile</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">VR Texture Quality (<code>vr_renopt_tex_res_04</code>)</div>
+            <div class="control-hint">High (3) or Medium (2) stops the 8GB VRAM overflow &amp; blurry 0.0625x gauge bug</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_tex_res_04" onchange="recalc()">
+              <option value="1">Low (1) — ~4.8 GB VRAM</option>
+              <option value="2">Medium (2) — ~5.5 GB VRAM (Safest)</option>
+              <option value="3">High (3) — ~6.3 GB VRAM (Recommended)</option>
+              <option value="4">Maximum (4) — Overflow Risk on 8GB!</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">2D Desktop Mirror Mode During VR</div>
+            <div class="control-hint">Running 1280×720 Windowed instead of 5120×2160 Fullscreen frees ~500 MB VRAM</div>
+          </div>
+          <div class="control-widget">
+            <select id="win_windowed_for_vr" onchange="recalc()">
+              <option value="true">1280×720 Windowed (Saves ~500MB VRAM)</option>
+              <option value="false">5120×2160 Fullscreen (High VRAM Cost)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">AMD FidelityFX Super Resolution (<code>vr_renopt_FSR_04</code>)</div>
+            <div class="control-hint">Upscaling + RCAS sharpening relieves RTX 2070 pixel shader bottleneck</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_FSR_04" onchange="recalc()">
+              <option value="0">Off — Full Native Resolution (0)</option>
+              <option value="1">Ultra Quality — 0.77x Scale (1) [Recommended]</option>
+              <option value="2">Quality — 0.67x Scale (2) [Max FPS]</option>
+              <option value="3">Balanced — 0.59x Scale (3)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">CAS Cockpit Sharpening (<code>_rcas_ratio</code>)</div>
+            <div class="control-hint">0.55–0.65 restores crisp glass cockpit &amp; steam gauge text</div>
+          </div>
+          <div class="control-widget">
+            <input type="range" id="xp__rcas_ratio" min="0" max="1" step="0.05" value="0.55" oninput="recalc()" />
+            <span class="range-val" id="val_xp__rcas_ratio">55%</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Hardware Variable Rate Shading (<code>_vr_vrs_enable</code>)</div>
+            <div class="control-hint">Uses RTX 2070 Turing VRS to shade peripheral edges faster</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp__vr_vrs_enable" onchange="recalc()">
+              <option value="1">Enabled — Max Foveated Preset (3)</option>
+              <option value="0">Disabled (0)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Ambient Occlusion SSAO (<code>vr_renopt_SSAO_04</code>)</div>
+            <div class="control-hint">Very heavy in VR stereo rendering; Off (0) gains +12–15% GPU FPS</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_SSAO_04" onchange="recalc()">
+              <option value="0">Off (0) — Recommended for VR</option>
+              <option value="1">Low (1)</option>
+              <option value="2">Medium (2)</option>
+              <option value="3">High (3)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Volumetric Cloud Quality (<code>vr_renopt_clouds_02</code>)</div>
+            <div class="control-hint">Medium (1) balances 3D cloud immersion and RTX 2070 ray-marching speed</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_clouds_02" onchange="recalc()">
+              <option value="0">Low (0)</option>
+              <option value="1">Medium (1) — Recommended</option>
+              <option value="2">High (2)</option>
+              <option value="3">Maximum (3)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">World Objects Density (<code>vr_renopt_draw_3d_04</code>)</div>
+            <div class="control-hint">Primary i9-9900K CPU draw-call setting; Medium (2) prevents stutters</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_draw_3d_04" onchange="recalc()">
+              <option value="1">Low (1) — Best for Big Hubs</option>
+              <option value="2">Medium (2) — Balanced for i9-9900K</option>
+              <option value="3">High (3)</option>
+              <option value="4">Maximum (4) — CPU Bottleneck in VR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Rendering Distance (<code>vr_renopt_draw_distance04</code>)</div>
+            <div class="control-hint">Medium (2) reduces loaded DSF mesh triangles &amp; RAM/VRAM pressure</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_draw_distance04" onchange="recalc()">
+              <option value="1">Low (1)</option>
+              <option value="2">Medium (2) — Recommended</option>
+              <option value="3">High (3)</option>
+              <option value="4">Maximum (4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Shadow Quality (<code>vr_renopt_shadow_quality_04</code>)</div>
+            <div class="control-hint">Aircraft Only (0) keeps crisp cockpit self-shadows without scenery shadow cost</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_shadow_quality_04" onchange="recalc()">
+              <option value="0">Aircraft Only (0) — Recommended</option>
+              <option value="1">Low (1)</option>
+              <option value="2">Medium (2)</option>
+              <option value="3">High (3)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Anti-Aliasing: FXAA Post-Blur &amp; MSAA</div>
+            <div class="control-hint">FXAA Off (0) prevents blurring thin 1px instrument numbers; FXAA On (1) smooths shimmer</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_FXAA" onchange="recalc()">
+              <option value="0">FXAA Off + MSAA Off (Sharpest Instrument Text!)</option>
+              <option value="1">FXAA On + MSAA Off (Smoothest Scenery Edges)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">3D Trees &amp; Vegetation Density</div>
+            <div class="control-hint">Low + 2D trees for airliners; 3D trees On for bush strips</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_vegetation_3d" onchange="recalc()">
+              <option value="0">3D Trees Off (Low Veg) — Max FPS</option>
+              <option value="1">3D Trees On (Med Veg) — Bush Flying</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Draw Parked Aircraft (<code>vr_renopt_static_acf</code>)</div>
+            <div class="control-hint">Disabling static aircraft liveries saves ~250–350 MB of VRAM at airports</div>
+          </div>
+          <div class="control-widget">
+            <select id="xp_vr_renopt_static_acf" onchange="recalc()">
+              <option value="0">Off (0) — Save ~300 MB VRAM</option>
+              <option value="1">On (1)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Meta Quest Pro Link & OpenXR Settings -->
+      <div class="panel-box">
+        <div class="section-title">
+          <span>3. Meta Quest Pro OpenXR, Local Dimming &amp; Link Tuning</span>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Horizontal FOV Tangent Multiplier</div>
+            <div class="control-hint">0.80 fits Quest Pro's open-periphery halo mount while focusing texels on gauges</div>
+          </div>
+          <div class="control-widget">
+            <input type="range" id="q_fov_x" min="0.70" max="1.00" step="0.02" value="0.80" oninput="recalc()" />
+            <span class="range-val" id="val_q_fov_x">0.80</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Vertical FOV Tangent Multiplier</div>
+            <div class="control-hint">0.74 trims unseen brow/cheek gap on Quest Pro for huge VRAM &amp; FPS savings</div>
+          </div>
+          <div class="control-widget">
+            <input type="range" id="q_fov_y" min="0.70" max="1.00" step="0.02" value="0.74" oninput="recalc()" />
+            <span class="range-val" id="val_q_fov_y">0.74</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Pixels Per Display Pixel Override (SuperSampling)</div>
+            <div class="control-hint">1.25x (+56% instrument pixel density) makes G1000 &amp; steam gauge text crystal clear</div>
+          </div>
+          <div class="control-widget">
+            <input type="range" id="q_ppdp" min="0.85" max="1.40" step="0.05" value="1.25" oninput="recalc()" />
+            <span class="range-val" id="val_q_ppdp">1.25x</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">500-Zone Mini-LED Local Dimming (Quest Pro QLED)</div>
+            <div class="control-hint">Activates hardware local dimming on Quest Pro for true blacks in night cockpits</div>
+          </div>
+          <div class="control-widget">
+            <select id="q_local_dimming">
+              <option value="1">Enabled (1) — Deep QLED Night Blacks</option>
+              <option value="0">Disabled (0)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Asynchronous Spacewarp (ASW 2.0 Frame Pacing)</div>
+            <div class="control-hint">45 Hz Forced (Clock45) locks butter-smooth 45→90fps with X-Plane Depth Reprojection</div>
+          </div>
+          <div class="control-widget">
+            <select id="q_asw_mode" onchange="recalc()">
+              <option value="Clock45">45 Hz Locked + ASW On (Clock45) [Recommended]</option>
+              <option value="Auto">Auto ASW</option>
+              <option value="Off">ASW Disabled (Off)</option>
+              <option value="Clock30">30 Hz Locked (Clock30 — 1/3 Refresh)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Quest Link Sharpening &amp; Layer Mip-Bias</div>
+            <div class="control-hint">Quality (3) + negative compositor mip-bias keeps tiny digits crisp during head movement</div>
+          </div>
+          <div class="control-widget">
+            <select id="q_link_sharpening">
+              <option value="3">Quality (3) + Mip-Bias ON [Sharpest Text]</option>
+              <option value="2">Normal (2)</option>
+              <option value="1">Disabled (1)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">USB 3.0 Link Encode Bitrate (<code>BitrateMbps</code>)</div>
+            <div class="control-hint">325 Mbps H.264 is the sweet spot for Quest Pro's Snapdragon XR2+ Gen 1 decoder</div>
+          </div>
+          <div class="control-widget">
+            <input type="range" id="q_bitrate_mbps" min="150" max="500" step="25" value="325" oninput="recalc()" />
+            <span class="range-val" id="val_q_bitrate_mbps">325M</span>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Encode Width &amp; Distortion Curvature</div>
+            <div class="control-hint">3600px (2×1800 native Quest Pro width) + Low Curvature maximizes center PPD</div>
+          </div>
+          <div class="control-widget">
+            <select id="q_encode_width">
+              <option value="3600">3600px (Quest Pro 1:1 Native) + Low Curvature</option>
+              <option value="3664">3664px (Quest 3 Native) + Low Curvature</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <div class="control-info">
+            <div class="control-name">Video Codec &amp; Sliced Encoding</div>
+            <div class="control-hint">H.264 + 5 Slices minimizes RTX 2070 Turing NVENC latency</div>
+          </div>
+          <div class="control-widget">
+            <select id="q_video_codec">
+              <option value="h264">H.264 + 5 Slices + Dynamic Bitrate Off</option>
+              <option value="h265">H.265 (HEVC) + 5 Slices</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- OFXR-Bridge 0.3.1 Optical Flow Frame Generation Section -->
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 2px solid var(--accent);">
+          <div class="section-title" style="margin-bottom: 6px;">
+            <span>4. OFXR-Bridge 0.3.1 Optical Flow Frame Generation</span>
+            <button class="btn-secondary" style="padding: 4px 10px; font-size: 0.76rem;" onclick="openOfxrSettings()">⚙️ Open OFXR Native Panel</button>
+          </div>
+          <div class="control-hint" id="ofxr-flight-status" style="margin-bottom: 10px; color: var(--accent);">
+            OpenXR + D3D11/Vulkan→D3D12 Bridge for Meta Quest Pro
+          </div>
+
+          <div class="control-row">
+            <div class="control-info">
+              <div class="control-name">OFXR-Bridge Status (Arm / Disarm Layer)</div>
+              <div class="control-hint">When Armed, automatically sets Meta Link ASW to Off so they don't double-interpolate</div>
+            </div>
+            <div class="control-widget">
+              <select id="ofxr_armed" onchange="onOfxrArmedChange()">
+                <option value="true">🟢 Armed (Enabled — Active on X-Plane Launch)</option>
+                <option value="false">⚪ Disarmed (Disabled — Use Meta Link ASW)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-info">
+              <div class="control-name">Optical Flow Engine / Route</div>
+              <div class="control-hint">RTX 2070 (Turing) supports hardware NVOFA Optical Flow + FidelityFX fallback</div>
+            </div>
+            <div class="control-widget">
+              <select id="ofxr_backend" onchange="recalc()">
+                <option value="2">NVIDIA Optical Flow 0.2.13 (Recommended)</option>
+                <option value="3">NVIDIA Optical Flow 0.3.0 (Djules Route)</option>
+                <option value="1">NVIDIA Optical Flow 0.2.1 (Legacy Reference)</option>
+                <option value="0">AMD FidelityFX Optical Flow (Compute)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-info">
+              <div class="control-name">Optical Flow Quality Preset &amp; Input Scale</div>
+              <div class="control-hint">Medium + 50% Flow Scale gives crisp motion vectors with minimal GPU time</div>
+            </div>
+            <div class="control-widget">
+              <select id="ofxr_preset" onchange="recalc()" style="width: 48%;">
+                <option value="1">Medium</option>
+                <option value="2">Fast</option>
+                <option value="0">Slow</option>
+              </select>
+              <select id="ofxr_scale" onchange="recalc()" style="width: 48%;">
+                <option value="2">50% Scale</option>
+                <option value="1">75% Scale</option>
+                <option value="0">100% Full</option>
+                <option value="3">25% Scale</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-info">
+              <div class="control-name">Fast Mode — Lower VRAM &amp; Single Swapchain Rings</div>
+              <div class="control-hint">CRITICAL for 8 GB RTX 2070: reduces synthesis swapchain VRAM footprint</div>
+            </div>
+            <div class="control-widget">
+              <select id="ofxr_lower_vram" onchange="recalc()">
+                <option value="1">Enabled (1) — Save VRAM on 8GB RTX 2070</option>
+                <option value="0">Disabled (0) — Double Synthesis Buffers</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="control-info">
+              <div class="control-name">Frame Generation Multiplier &amp; In-Headset FPS Counter</div>
+              <div class="control-hint">2X (45→90 FPS) or 3X (30→90 FPS); pause key in-sim is <code>Ctrl+Alt+F7</code></div>
+            </div>
+            <div class="control-widget">
+              <select id="ofxr_triple_fg" onchange="recalc()" style="width: 48%;">
+                <option value="0">2X (45→90)</option>
+                <option value="1">3X (30→90)</option>
+              </select>
+              <select id="ofxr_overlay" onchange="setOfxrOverlayLive(this.value)" style="width: 48%;">
+                <option value="0">Overlay: Off (Clean)</option>
+                <option value="2">FPS Only: Top Right</option>
+                <option value="1">FPS Only: Top Left</option>
+                <option value="6">Full Debug Meter: Bottom</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live In-Headset Performance HUD Quick Switcher -->
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
+          <div class="control-name">Live In-Headset Meta Performance HUD (Instant Toggle via CLI)</div>
+          <div class="control-hint">Overlay real-time FPS, headroom, and Link status inside your Quest Pro while flying</div>
+          <div class="hud-pills">
+            <button class="hud-pill active" onclick="setHud(0, this)">HUD Off</button>
+            <button class="hud-pill" onclick="setHud(1, this)">1: Perf Summary (FPS &amp; Headroom)</button>
+            <button class="hud-pill" onclick="setHud(2, this)">2: Latency Timing</button>
+            <button class="hud-pill" onclick="setHud(3, this)">3: App Render Timing</button>
+            <button class="hud-pill" onclick="setHud(5, this)">5: ASW Status</button>
+            <button class="hud-pill" onclick="setHud(7, this)">7: Pixel Density</button>
+          </div>
+        </div>
+
+        <!-- Backups & Restore Section -->
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
+          <div class="control-name">Automatic Preference &amp; Registry Backups (incl. Pre-OFXR Golden Snapshot)</div>
+          <div class="control-hint">Every time you click Apply, your previous X-Plane.prf &amp; Registry are backed up here:</div>
+          <div class="backup-list" id="backup-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let appState = null;
+    let selectedPresetId = 'quest_pro_sharp_text';
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerHTML = msg;
+      t.style.display = 'block';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 5500);
+    }
+
+    async function loadStatus() {
+      const res = await fetch('/api/status');
+      appState = await res.json();
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const q = appState.quest_status;
+      const log = appState.log_analysis;
+      const xp = appState.xp_current;
+      const ofxr = appState.ofxr_status || { tray_running: false, openxr_layer_armed: false, settings: {} };
+
+      document.getElementById('quest-title').textContent =
+        `${q.model} (${q.connected ? 'Connected' : 'Default Profile Ready'})`;
+      document.getElementById('quest-sub').textContent =
+        `Serial: ${q.serial} • IPD: ${q.ipd_mm ?? 65.3} mm • Local Dimming: ON • OVRService: ${q.ovr_service_running ? 'Running' : 'Stopped'}`;
+
+      const isArmed = ofxr.tray_running && ofxr.openxr_layer_armed;
+      document.getElementById('ofxr-title').textContent =
+        isArmed ? '🟢 OFXR-Bridge 0.3.1 Armed' : '⚪ OFXR-Bridge Disarmed';
+      document.getElementById('ofxr-sub').textContent =
+        isArmed
+          ? `OpenXR + Vulkan Layers Active • Lower-VRAM Fast Mode ON`
+          : `Using Native Meta Quest Link ASW`;
+      document.getElementById('ofxr-flight-status').textContent =
+        ofxr.last_flight_summary || 'Ready — waiting for X-Plane 12 VR session';
+
+      // Diagnostic Banner
+      const banner = document.getElementById('diag-banner');
+      const heading = document.getElementById('diag-heading');
+      const list = document.getElementById('diag-items');
+      const issues = [];
+
+      if (xp._vr_separate_graphics_settings === 0) {
+        issues.push('<strong>Separate VR Graphics Profile is OFF (<code>_vr_separate_graphics_settings 0</code>):</strong> X-Plane 12 was ignoring your VR settings and using your heavy 5K2K desktop settings inside VR.');
+      }
+      if (log.vram_thrash_count > 0 && (xp._vr_separate_graphics_settings === 0 || xp.vr_renopt_tex_res_04 >= 4)) {
+        issues.push(`<strong>Severe 8GB VRAM Exhaustion Detected in Log.txt (${log.vram_thrash_count} events):</strong> VRAM headroom dropped to <code>${log.min_headroom_mb} MB</code>, forcing X-Plane's Vulkan pager to downscale cockpit textures to <code>${log.min_texture_scale}x</code> (blurry instruments).`);
+      }
+      if (xp.window_info && xp.window_info.mode === 'wmgr_mode_fullscreen' && xp.window_info.full_x >= 5120) {
+        issues.push('<strong>5120×2160 Fullscreen Desktop Swapchain Active:</strong> Allocating a 5K2K HDR desktop swapchain alongside Meta Quest Link wastes ~500 MB of your 8 GB VRAM during VR sessions.');
+      }
+
+      if (issues.length > 0) {
+        banner.className = 'diag-banner warn';
+        heading.innerHTML = '⚠️ Bottlenecks Found in Current X-Plane 12 Configuration — Click "Apply &amp; Save Optimizations" to Fix';
+        list.innerHTML = issues.map(i => `<li>${i}</li>`).join('');
+      } else {
+        banner.className = 'diag-banner good';
+        heading.innerHTML = '✅ X-Plane 12 + Meta Quest Pro + OFXR-Bridge 0.3.1 Configured &amp; Ready!';
+        list.innerHTML = `
+          <li><strong>OFXR-Bridge 0.3.1 (v681):</strong> ${isArmed ? '🟢 Armed with NVIDIA Optical Flow + D3D11/Vulkan→D3D12 Session Bridge + Lower-VRAM Fast Mode' : '⚪ Disarmed (Meta Link ASW Active)'} — ${ofxr.last_flight_summary || ''}</li>
+          <li><strong>Cockpit Text Clarity:</strong> Dedicated VR profile (<code>1.25x PPDP</code>, <code>FSR Off</code>, <code>FXAA Off</code>, <code>75% CAS</code>, <code>Layer Mip-Bias ON</code>) with <code>1280×720 Windowed</code> desktop mirror.</li>
+          <li><strong>Golden Pre-OFXR Backup Saved:</strong> <code>GOLDEN_WORKING_PRE_OFXR_20261025_220314</code> is available below for instant 1-click rollback anytime.</li>
+        `;
+      }
+
+      // Render Presets
+      const pContainer = document.getElementById('presets-container');
+      pContainer.innerHTML = '';
+      Object.values(appState.presets).forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'preset-card' + (p.id === selectedPresetId ? ' active' : '');
+        div.onclick = () => selectPreset(p.id);
+        const ofxrBadge = (p.ofxr_settings && p.ofxr_settings.armed) ? '🟢 OFXR ON' : '⚪ OFXR OFF';
+        div.innerHTML = `
+          <div>
+            <div class="preset-top">
+              <div class="preset-name">${p.name}</div>
+              <span class="badge">${p.badge}</span>
+            </div>
+            <div class="preset-desc">${p.description}</div>
+          </div>
+          <div style="font-size:0.76rem; color:var(--accent); font-weight:600;">
+            ${ofxrBadge} • FOV: ${p.quest_settings.fov_x}×${p.quest_settings.fov_y} • PPDP: ${p.quest_settings.ppdp}x • Meta ASW: ${p.quest_settings.asw_mode}
+          </div>
+        `;
+        pContainer.appendChild(div);
+      });
+
+      // Render Backups
+      const bList = document.getElementById('backup-list');
+      if (!appState.backups || appState.backups.length === 0) {
+        bList.innerHTML = '<div style="font-size:0.78rem; color:var(--muted);">No backups yet — one will be created automatically when you click Apply.</div>';
+      } else {
+        bList.innerHTML = appState.backups.map(b => `
+          <div class="backup-item">
+            <span>📁 <strong>${b.name}</strong> (${b.time})</span>
+            <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="restoreBackup('${b.name}')">Restore</button>
+          </div>
+        `).join('');
+      }
+
+      // Populate controls from current or default Quest Pro preset
+      if (q.last_cli && q.last_cli.preset_id && appState.presets[q.last_cli.preset_id]) {
+        selectedPresetId = q.last_cli.preset_id;
+      } else {
+        selectedPresetId = appState.default_preset_id || 'quest_pro_sharp_text';
+      }
+      selectPreset(selectedPresetId);
+    }
+
+    function setVal(id, v) {
+      const el = document.getElementById(id);
+      if (el) el.value = String(v);
+    }
+
+    function onOfxrArmedChange() {
+      const armed = document.getElementById('ofxr_armed').value === 'true';
+      if (armed) {
+        // Turn off Meta Link ASW so it does not fight OFXR-Bridge
+        setVal('q_asw_mode', 'Off');
+      } else {
+        setVal('q_asw_mode', 'Clock45');
+      }
+      recalc();
+    }
+
+    function selectPreset(id) {
+      selectedPresetId = id;
+      const p = appState.presets[id];
+      if (!p) return;
+
+      document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+      const cards = document.querySelectorAll('.preset-card');
+      const idx = Object.keys(appState.presets).indexOf(id);
+      if (cards[idx]) cards[idx].classList.add('active');
+
+      const s = p.xp_settings;
+      setVal('xp__vr_separate_graphics_settings', s._vr_separate_graphics_settings ?? 1);
+      setVal('xp_vr_renopt_tex_res_04', s.vr_renopt_tex_res_04 ?? s.renopt_tex_res_04 ?? 3);
+      setVal('win_windowed_for_vr', p.window_settings.windowed_for_vr ? 'true' : 'false');
+      setVal('xp_vr_renopt_FSR_04', s.vr_renopt_FSR_04 ?? s.renopt_FSR_04 ?? 0);
+      setVal('xp__rcas_ratio', s._rcas_ratio ?? 0.75);
+      setVal('xp__vr_vrs_enable', s._vr_vrs_enable ?? 0);
+      setVal('xp_vr_renopt_SSAO_04', s.vr_renopt_SSAO_04 ?? s.renopt_SSAO_04 ?? 0);
+      setVal('xp_vr_renopt_clouds_02', s.vr_renopt_clouds_02 ?? s.renopt_clouds_02 ?? 1);
+      setVal('xp_vr_renopt_draw_3d_04', s.vr_renopt_draw_3d_04 ?? s.renopt_draw_3d_04 ?? 1);
+      setVal('xp_vr_renopt_draw_distance04', s.vr_renopt_draw_distance04 ?? s.renopt_draw_distance04 ?? 1);
+      setVal('xp_vr_renopt_shadow_quality_04', s.vr_renopt_shadow_quality_04 ?? s.renopt_shadow_quality_04 ?? 0);
+      setVal('xp_vr_renopt_FXAA', s.vr_renopt_FXAA ?? s.renopt_FXAA ?? 0);
+      setVal('xp_vr_renopt_vegetation_3d', s.vr_renopt_vegetation_3d ?? s.renopt_vegetation_3d ?? 0);
+      setVal('xp_vr_renopt_static_acf', s.vr_renopt_static_acf ?? s.renopt_static_acf ?? 0);
+
+      const q = p.quest_settings;
+      setVal('q_fov_x', q.fov_x);
+      setVal('q_fov_y', q.fov_y);
+      setVal('q_ppdp', q.ppdp);
+      setVal('q_local_dimming', q.local_dimming ?? 1);
+      setVal('q_asw_mode', q.asw_mode);
+      setVal('q_link_sharpening', q.link_sharpening);
+      setVal('q_bitrate_mbps', q.bitrate_mbps);
+      setVal('q_encode_width', q.encode_width ?? 3600);
+      setVal('q_video_codec', q.video_codec);
+
+      const o = p.ofxr_settings || { armed: true, backend: 2, preset: 1, scale: 2, lower_vram: 1, triple_frame_gen: 0, overlay_position: 0 };
+      setVal('ofxr_armed', o.armed ? 'true' : 'false');
+      setVal('ofxr_backend', o.backend ?? 2);
+      setVal('ofxr_preset', o.preset ?? 1);
+      setVal('ofxr_scale', o.scale ?? 2);
+      setVal('ofxr_lower_vram', o.lower_vram ?? 1);
+      setVal('ofxr_triple_fg', o.triple_frame_gen ?? 0);
+      setVal('ofxr_overlay', o.overlay_position ?? 0);
+
+      recalc();
+    }
+
+    function recalc() {
+      const rcas = parseFloat(document.getElementById('xp__rcas_ratio').value);
+      const fovX = parseFloat(document.getElementById('q_fov_x').value);
+      const fovY = parseFloat(document.getElementById('q_fov_y').value);
+      const ppdp = parseFloat(document.getElementById('q_ppdp').value);
+      const bitrate = parseInt(document.getElementById('q_bitrate_mbps').value, 10);
+
+      document.getElementById('val_xp__rcas_ratio').textContent = Math.round(rcas * 100) + '%';
+      document.getElementById('val_q_fov_x').textContent = fovX.toFixed(2);
+      document.getElementById('val_q_fov_y').textContent = fovY.toFixed(2);
+      document.getElementById('val_q_ppdp').textContent = ppdp.toFixed(2) + 'x';
+      document.getElementById('val_q_bitrate_mbps').textContent = bitrate + 'M';
+
+      // Estimate VRAM out of 7.82 GB
+      const texRes = parseInt(document.getElementById('xp_vr_renopt_tex_res_04').value, 10);
+      const windowed = document.getElementById('win_windowed_for_vr').value === 'true';
+      const fsr = parseInt(document.getElementById('xp_vr_renopt_FSR_04').value, 10);
+      const staticAcf = parseInt(document.getElementById('xp_vr_renopt_static_acf').value, 10);
+      const draw3d = parseInt(document.getElementById('xp_vr_renopt_draw_3d_04').value, 10);
+      const ofxrArmed = document.getElementById('ofxr_armed').value === 'true';
+      const ofxrLowVram = parseInt(document.getElementById('ofxr_lower_vram').value, 10) === 1;
+
+      let vram = 3.1; // Base X-Plane 12 + OpenXR + Oculus Link runtime
+      vram += [0.6, 0.9, 1.35, 2.0, 3.3][texRes] || 2.0;
+      if (!windowed) vram += 0.52;
+      if (staticAcf === 1) vram += 0.28;
+      vram += draw3d * 0.14;
+      vram *= (0.72 + 0.28 * (fovX * fovY * ppdp));
+      if (ofxrArmed) {
+        // OFXR-Bridge D3D11->D3D12 interop swapchain cost (~0.55 GB in Lower VRAM mode, ~0.68 GB standard)
+        vram += ofxrLowVram ? 0.55 : 0.70;
+      }
+
+      const maxHeap = 7.82;
+      const pct = Math.min(100, Math.round((vram / maxHeap) * 100));
+      const vBar = document.getElementById('vram-bar');
+      vBar.style.width = pct + '%';
+      let statusTxt = 'Safe Headroom';
+      if (vram > 7.35) {
+        vBar.style.background = 'var(--danger)';
+        statusTxt = 'Overflow Risk!';
+      } else if (vram > 6.65) {
+        vBar.style.background = 'var(--warn)';
+        statusTxt = 'Tight';
+      } else {
+        vBar.style.background = 'var(--success)';
+      }
+      document.getElementById('vram-label').textContent = `${vram.toFixed(2)} / ${maxHeap} GB (${statusTxt})`;
+
+      // Estimate Effective Shaded Resolution per eye
+      const fsrScaleMap = { 0: 1.0, 1: 0.77, 2: 0.67, 3: 0.59 };
+      const fsrScale = fsrScaleMap[fsr] || 1.0;
+      const baseW = 1800, baseH = 1920;
+      const effW = Math.round(baseW * fovX * ppdp * fsrScale);
+      const effH = Math.round(baseH * fovY * ppdp * fsrScale);
+      const ratio = (effW * effH) / (baseW * baseH);
+      const savedPct = Math.round((1 - ratio) * 100);
+      document.getElementById('pixel-label').textContent =
+        `${effW} × ${effH} / eye (${savedPct >= 0 ? '-' + savedPct : '+' + Math.abs(savedPct)}% vs base)`;
+      document.getElementById('pixel-bar').style.width = Math.min(100, Math.round(ratio * 100)) + '%';
+
+      const asw = document.getElementById('q_asw_mode').value;
+      const tripleFg = parseInt(document.getElementById('ofxr_triple_fg').value, 10) === 1;
+      if (ofxrArmed) {
+        document.getElementById('pacing-label').textContent = tripleFg
+          ? 'OFXR 3X Optical Flow (30 → 90 Hz)'
+          : 'OFXR 2X Optical Flow (45 → 90 Hz)';
+      } else {
+        const aswNames = {
+          Clock45: '45 FPS Locked → 90 Hz Meta ASW 2.0',
+          Auto: 'Dynamic 45/90 Hz Auto ASW',
+          Off: 'Raw Uncapped Frame Rate (ASW Off)',
+          Clock30: '30 FPS Locked → 90 Hz (1/3 Refresh)',
+        };
+        document.getElementById('pacing-label').textContent = aswNames[asw] || asw;
+      }
+    }
+
+    function collectPayload() {
+      const texRes = parseInt(document.getElementById('xp_vr_renopt_tex_res_04').value, 10);
+      const veg3d = parseInt(document.getElementById('xp_vr_renopt_vegetation_3d').value, 10);
+      const vrs = parseInt(document.getElementById('xp__vr_vrs_enable').value, 10);
+      const windowed = document.getElementById('win_windowed_for_vr').value === 'true';
+
+      return {
+        preset_id: selectedPresetId,
+        xp_settings: {
+          _vr_separate_graphics_settings: parseInt(document.getElementById('xp__vr_separate_graphics_settings').value, 10),
+          _vr_vrs_enable: vrs,
+          _vr_vrs_preset: vrs ? 2 : 1,
+          _vr_depth_reprojection: 1,
+          _vr_runtime_id: 'openxr',
+          _rcas_ratio: parseFloat(document.getElementById('xp__rcas_ratio').value),
+          _fms_per_frame: 2,
+          _tex_res: Math.min(4, texRes + 1),
+          renopt_tex_res_04: texRes,
+          vr_renopt_tex_res_04: texRes,
+          vr_renopt_FSR_04: parseInt(document.getElementById('xp_vr_renopt_FSR_04').value, 10),
+          vr_renopt_MSAA: 0,
+          vr_renopt_FXAA: parseInt(document.getElementById('xp_vr_renopt_FXAA').value, 10),
+          vr_renopt_SSAO_04: parseInt(document.getElementById('xp_vr_renopt_SSAO_04').value, 10),
+          vr_renopt_clouds_02: parseInt(document.getElementById('xp_vr_renopt_clouds_02').value, 10),
+          vr_renopt_draw_3d_04: parseInt(document.getElementById('xp_vr_renopt_draw_3d_04').value, 10),
+          vr_renopt_draw_distance04: parseInt(document.getElementById('xp_vr_renopt_draw_distance04').value, 10),
+          vr_renopt_shadow_quality_04: parseInt(document.getElementById('xp_vr_renopt_shadow_quality_04').value, 10),
+          vr_renopt_vegetation_3d: veg3d,
+          vr_renopt_vegetation_quality_04: veg3d ? 2 : 1,
+          vr_renopt_ANISO: 16,
+          vr_renopt_static_acf: parseInt(document.getElementById('xp_vr_renopt_static_acf').value, 10),
+          vr_renopt_boats: 0,
+        },
+        window_settings: {
+          windowed_for_vr: windowed,
+          width: windowed ? 1280 : 5120,
+          height: windowed ? 720 : 2160,
+        },
+        quest_settings: {
+          fov_x: parseFloat(document.getElementById('q_fov_x').value),
+          fov_y: parseFloat(document.getElementById('q_fov_y').value),
+          ppdp: parseFloat(document.getElementById('q_ppdp').value),
+          asw_mode: document.getElementById('q_asw_mode').value,
+          perf_hud: 0,
+          bitrate_mbps: parseInt(document.getElementById('q_bitrate_mbps').value, 10),
+          encode_width: parseInt(document.getElementById('q_encode_width').value, 10),
+          link_sharpening: parseInt(document.getElementById('q_link_sharpening').value, 10),
+          distortion_curve: 1,
+          num_slices: 5,
+          dynamic_bitrate: 0,
+          video_codec: document.getElementById('q_video_codec').value,
+          local_dimming: parseInt(document.getElementById('q_local_dimming').value, 10),
+        },
+        ofxr_settings: {
+          armed: document.getElementById('ofxr_armed').value === 'true',
+          backend: parseInt(document.getElementById('ofxr_backend').value, 10),
+          preset: parseInt(document.getElementById('ofxr_preset').value, 10),
+          scale: parseInt(document.getElementById('ofxr_scale').value, 10),
+          lower_vram: parseInt(document.getElementById('ofxr_lower_vram').value, 10),
+          triple_frame_gen: parseInt(document.getElementById('ofxr_triple_fg').value, 10),
+          overlay_position: parseInt(document.getElementById('ofxr_overlay').value, 10),
+          diagnostics: 1,
+        }
+      };
+    }
+
+    async function applySettings() {
+      const payload = collectPayload();
+      const res = await fetch('/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        appState = data.state;
+        renderDashboard();
+        showToast(`✅ <strong>Applied &amp; Backed Up!</strong><br/>Updated <code>X-Plane.prf</code>, Quest Pro Link, and <code>OFXR-Bridge 0.3.1</code> configuration.`);
+      } else {
+        showToast(`❌ Error: ${data.error}`);
+      }
+    }
+
+    async function restoreBackup(name) {
+      const res = await fetch('/api/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ backup_name: name })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        appState = data.state;
+        renderDashboard();
+        showToast(`🔄 Restored backup <strong>${name}</strong>!`);
+      }
+    }
+
+    async function setHud(mode, btn) {
+      document.querySelectorAll('.hud-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      await fetch('/api/hud', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode })
+      });
+      showToast(`🥽 Switched Quest Pro In-Headset Performance HUD to Mode ${mode}`);
+    }
+
+    async function launchXPlane() {
+      await applySettings();
+      const res = await fetch('/api/launch_xp', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        showToast(`🚀 <strong>Launching X-Plane 12 with Quest Pro + OFXR-Bridge!</strong><br/>Armed OFXR-Bridge 0.3.1 &amp; applied Quest Pro OpenXR settings.`);
+      }
+    }
+
+    async function openODT() {
+      await fetch('/api/open_odt', { method: 'POST' });
+      showToast('🛠 Opened Oculus Debug Tool GUI.');
+    }
+
+    async function openOfxrSettings() {
+      await fetch('/api/open_ofxr_settings', { method: 'POST' });
+      showToast('⚙️ Opened OFXR-Bridge 0.3.1 Native Settings Panel.');
+    }
+
+    async function setOfxrOverlayLive(val) {
+      const pos = parseInt(val, 10);
+      const res = await fetch('/api/ofxr_overlay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ overlay_position: pos })
+      });
+      const data = await res.json();
+      const labels = {
+        0: 'Off (Clean)',
+        1: 'FPS Only (Top Left)',
+        2: 'FPS Only (Top Right)',
+        6: 'Full Debug Meter (Bottom)'
+      };
+      if (data.ok) {
+        showToast(`👁️ OFXR Overlay set to <strong>${labels[pos] || pos}</strong> (applies live in headset)`);
+      }
+    }
+
+    loadStatus();
+  </script>
+</body>
+</html>

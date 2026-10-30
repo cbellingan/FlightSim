@@ -1,0 +1,16 @@
+{
+  "id": "c172_sp",
+  "name": "Cessna 172 SP Skyhawk (Laminar Research)",
+  "category": "aircraft",
+  "engine": "Lycoming IO-360-L2A (180 HP)",
+  "poh_runup_rpm": 1800,
+  "magneto_drop_range_rpm": [75, 125],
+  "max_mag_differential_rpm": 50,
+  "xplane_profile": "C172 - MOZA AY210",
+  "moza_preset_uuid": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+  "switch_mappings": {
+    "moza_batt": "combined_alt_and_bat",
+    "moza_avionics": "standard_avionics",
+    "magneto_5pos": "direct_rotary_interception"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "generic_openxr",
+  "name": "Generic OpenXR Headset",
+  "category": "vr_headset",
+  "display": {
+    "panel": "OpenXR Standard HMD",
+    "refresh_rate_hz": 90,
+    "local_dimming": false,
+    "eye_tracking": false
+  },
+  "odt_settings": {},
+  "ofxr_bridge": {
+    "enabled": false,
+    "overlay": "off"
+  },
+  "xp_vr_overrides": {
+    "_vr_separate_graphics_settings": 1,
+    "_vr_vrs_enable": 0,
+    "_vr_depth_reprojection": 1,
+    "_rcas_ratio": 0.50,
+    "vr_renopt_FSR_04": 0,
+    "vr_renopt_FXAA": 0,
+    "vr_renopt_ANISO": 8
+  }
+}

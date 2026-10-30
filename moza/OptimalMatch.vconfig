@@ -1,0 +1,111 @@
+{
+    "Base": {
+        "AB6": {
+            "dcs_world": {
+                "A-10C_2": "{abe745d2-5caf-4a06-a366-20c0b613a113}",
+                "AH-64D_BLK_II": "{97579a3a-b6f9-49cd-b050-97f793687206}",
+                "AJS37": "{a46b78d0-bada-4efe-b8df-85c2600ac869}",
+                "AV-8B N/A": "{6f92285e-58a1-4e53-85e4-988520705b47}",
+                "Bf-109K-4": "{38e3641c-e851-472c-90a4-9f939a33e6db}",
+                "C-101EB": "{393e0015-edf8-4532-9647-01800c3f65bf}",
+                "CH-47Fbl1": "{4805a068-7a43-4124-8946-7551c78dac74}",
+                "Christen Eagle II": "{7ffade61-749e-461c-a505-45538039f7de}",
+                "F-14B": "{2776c169-90fb-4dbd-b24d-aa13812230fd}",
+                "F-15ESE": "{7be877ca-2b01-430c-8a77-5b62b4499466}",
+                "F-16C_50": "{62a70022-17b1-4884-9c38-b25b8eaff5c4}",
+                "F-4E-45MC": "{98e16e5a-178a-4ab8-8f64-4124c77ab0de}",
+                "F-5E-3": "{b52c15e3-a2cf-4cfa-b25c-fe2cf27fe3ef}",
+                "F-86F Sabre": "{c36e8217-2392-4497-b8ca-e561ca95f176}",
+                "F4U-1D": "{7b62a6b7-d7c7-44ad-a976-73a4a49c7671}",
+                "FA-18C_hornet": "{d5ef7750-80cf-42fc-86d3-d6b8488912bf}",
+                "FW-190A8": "{170451ed-20b8-4ac5-9867-ce4955dc12e6}",
+                "FW-190D9": "{29bc1a51-6c80-4017-b4a7-cf0569413879}",
+                "I-16": "{7cdd1e92-6768-4feb-92fc-2e85214daab1}",
+                "JF-17": "{0f2c3609-e58c-4e9c-a2af-19ffea52791a}",
+                "Ka-50_3": "{f3a44f73-b492-43e1-b31b-465fdfbdf32f}",
+                "L-39C": "{cc1be333-9386-4b5c-87db-eaa124dde1a0}",
+                "M-2000C": "{3daa7e22-77bf-418f-be77-711791ddd278}",
+                "MB-339A": "{a4d7a5cc-0506-4f27-9076-9121f8386955}",
+                "Mi-24P": "{5bdd7538-ae9d-480f-b722-23548477b6c4}",
+                "Mi-8MT": "{432efbe9-ed82-4e62-8636-530ecfa5485d}",
+                "MiG-15bis": "{02e78c22-766d-4add-abd9-e44948305d6a}",
+                "MiG-19P": "{e41e5a68-8724-422b-92e6-3bf6076b30c6}",
+                "MiG-21Bis": "{8b6e08ff-f3be-43d3-a8a6-1622028addcf}",
+                "MiG-29 Fulcrum": "{cf2656d2-5ed7-4006-8abd-2d6aec060975}",
+                "Mirage-F1CE": "{f69917b5-970e-4df4-adae-c0087de559c7}",
+                "MosquitoFBMkVI": "{ccf32e77-cf5c-46d5-9e70-e9ecf5d1a3fa}",
+                "OH58D": "{fd06a3b0-1749-4254-a8cd-ccfaadb6dead}",
+                "P-47D-30": "{e269826c-0699-40bd-90af-c0e2d7a435d3}",
+                "P-51D-30-NA": "{623dee6c-2d13-462c-955b-74870285a25a}",
+                "SpitfireLFMkIX": "{3773577b-38f7-4be1-b386-3c03c32ebed4}",
+                "Su-25T": "{b5b24d8a-7846-4ec6-bb14-d9c39e135b86}",
+                "UH-1H": "{df042130-09ad-4355-9ce0-e216b3947767}",
+                "Yak-52": "{feb52833-55ed-4d3a-8e04-3f9da9c5b5ac}"
+            }
+        },
+        "AB9": {
+            "dcs_world": {
+                "A-10C_2": "{698052c3-6f5c-4603-8c1c-78d917a7b1f9}",
+                "AH-64D_BLK_II": "{7c262635-0c17-44c3-a8e2-c24a66c84c05}",
+                "AJS37": "{719b064b-5afe-479a-a7ee-671bc0165831}",
+                "AV-8B N/A": "{9d3e9d0e-564e-4f2b-b29b-1ba0a4fe1e2a}",
+                "Bf-109K-4": "{6bd56b85-b1ab-49a0-bd93-d2f835cc0f6e}",
+                "C-101EB": "{9f489d2d-56c9-4187-adba-c2ec78377beb}",
+                "CH-47Fbl1": "{622ce794-fd75-4217-bd14-7a97b374a7e6}",
+                "Christen Eagle II": "{80b649c1-bc7e-49db-a3bf-578ca096ac44}",
+                "F-14B": "{a87c88ac-059e-4179-be7b-63b95803abf7}",
+                "F-15ESE": "{f9791700-86e0-4c53-b2f0-d1f552aa160c}",
+                "F-16C_50": "{f5e780ce-a2ae-4e01-92b2-1c752400fc94}",
+                "F-4E-45MC": "{35a899cc-cb9f-4e92-b2ca-cdd7f9e0d672}",
+                "F-5E-3": "{f7a7842a-05f4-4f26-bb2a-194016bc79ad}",
+                "F-86F Sabre": "{a7219d68-9a5f-4d39-a6bc-e46694c9816e}",
+                "F4U-1D": "{6e074850-59b0-4fc1-8461-ffd8a027c641}",
+                "FA-18C_hornet": "{25dab06b-7b9a-408e-962c-02a3ed510cd9}",
+                "FW-190A8": "{cd08a95f-ebc2-4961-8221-181426798aa0}",
+                "FW-190D9": "{a14daddb-9824-4347-92ed-368da9c47298}",
+                "I-16": "{189426db-06fd-4401-99cb-01eb2fb7afdf}",
+                "JF-17": "{0abe5628-8785-4646-ae57-683870a399bc}",
+                "Ka-50_3": "{42f79984-a97d-4caa-a4b8-f75dd6671b87}",
+                "L-39C": "{a259bfe0-b23b-476f-b5ca-45672ff260e3}",
+                "M-2000C": "{09938731-1be0-44f4-8508-fc39145fec76}",
+                "MB-339A": "{43b9dc34-5e0f-4cab-ac2d-a076b9f1d008}",
+                "Mi-24P": "{8861b5c0-feff-4bb4-8f17-dca9d01b8279}",
+                "Mi-8MT": "{916c9799-1416-4003-97ee-a4751976bbdc}",
+                "MiG-15bis": "{e06e4c45-8a13-4b14-853e-57b05ad20a75}",
+                "MiG-19P": "{4604993d-4c5e-451d-b0f4-95452144ff53}",
+                "MiG-21Bis": "{0072aae0-6e98-4c61-a2b7-cf5e8be4b452}",
+                "MiG-29 Fulcrum": "{3919dd13-45dc-4bd2-a1be-476a579c9403}",
+                "Mirage-F1CE": "{89e631a6-d030-4f3b-86f0-8f465908440d}",
+                "MosquitoFBMkVI": "{a2a45d26-69dd-473a-9ef5-ea1ec2d2d7e1}",
+                "OH58D": "{709a0722-9e15-4bb0-ba31-0b8a796e6398}",
+                "P-47D-30": "{61f63d8b-bb19-40f2-a77a-b21f46db5c1b}",
+                "P-51D-30-NA": "{14b38c19-9947-44bf-a18f-a20646303046}",
+                "SpitfireLFMkIX": "{ab8098da-8f20-48d7-b59e-b6e2658cdfc2}",
+                "Su-25T": "{0cb17737-9c77-4dda-8409-3d8d690316c2}",
+                "UH-1H": "{d6bd3f9d-d026-49f5-b8d1-52fe1c7678f7}",
+                "Yak-52": "{4085bd46-dd69-483d-9770-f68f9110c5d1}"
+            },
+            "microsoft_flight_simulator": {
+                "777-300ER": "{2e4e982e-fc2c-dafa-954f-15884319360f}"
+            }
+        },
+        "AY210": {
+            "microsoft_flight_simulator": {
+                "777-300ER": "{451c5c0d-2f0c-7157-a1bc-ab83da03db1b}"
+            },
+            "x_plane_12": {
+                "Cessna_172SP.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna_172SP_G1000.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna_172SP_seaplane.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna 172 SP/Cessna_172SP.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna 172 SP/Cessna_172SP_G1000.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna 172 SP/Cessna_172SP_seaplane.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "JF12_C152_v1.0/JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Just Flight/JF12_C152_v1.0/JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna C152": "{c1520000-3e98-444a-aaed-a13cd669052f}"
+            }
+        }
+    },
+    "version": "1.0.4"
+}

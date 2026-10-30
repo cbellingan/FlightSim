@@ -1,0 +1,19 @@
+{
+  "id": "rtx_4070ti_12gb",
+  "name": "NVIDIA GeForce RTX 4070 Ti (12GB VRAM)",
+  "category": "gpu",
+  "vram_gb": 12,
+  "optical_flow_supported": true,
+  "optical_flow_preset": "normal",
+  "xp_gpu_settings": {
+    "renopt_tex_res_04": 3,
+    "vr_renopt_tex_res_04": 3,
+    "vr_renopt_shadow_quality_04": 1,
+    "vr_renopt_draw_distance04": 2,
+    "vr_renopt_draw_3d_04": 2,
+    "vr_renopt_clouds_02": 2,
+    "vr_renopt_vegetation_3d": 1,
+    "vr_renopt_vegetation_quality_04": 2,
+    "vr_renopt_SSAO_04": 1
+  }
+}
