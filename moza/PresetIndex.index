@@ -1,0 +1,36 @@
+{
+    "presets": [
+        {
+            "date": "1793330000",
+            "device_type": "Base",
+            "devices": [
+                "AY210"
+            ],
+            "file_path": "C:/Users/cb/Documents/MOZA Cockpit/PresetLibrary/{c1720000-3e98-444a-aaed-a13cd669052f}.preset",
+            "games": [
+                "x_plane_12"
+            ],
+            "name": "AY210 C172",
+            "product_type": "AS23",
+            "uuid": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+            "vehicles": "Cessna_172SP.acf",
+            "version": "1.0.3"
+        },
+        {
+            "date": "1793330000",
+            "device_type": "Base",
+            "devices": [
+                "AY210"
+            ],
+            "file_path": "C:/Users/cb/Documents/MOZA Cockpit/PresetLibrary/{c1520000-3e98-444a-aaed-a13cd669052f}.preset",
+            "games": [
+                "x_plane_12"
+            ],
+            "name": "AY210 C152",
+            "product_type": "AS23",
+            "uuid": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+            "vehicles": "JF_C152.acf",
+            "version": "1.0.3"
+        }
+    ]
+}

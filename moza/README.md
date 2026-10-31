@@ -12,6 +12,7 @@ moza/
 │   ├── {c1720000-3e98-444a-aaed-a13cd669052f}.preset # AY210 C172 Preset
 │   └── {c1520000-3e98-444a-aaed-a13cd669052f}.preset # AY210 C152 Preset
 ├── OptimalMatch.vconfig                                # Auto-matching configuration
+├── PresetIndex.index                                   # Preset registration index
 └── telemetry_plugin/
     └── win.xpl                                         # X-Plane 12 64-bit telemetry bridge
 ```
@@ -35,8 +36,8 @@ moza/
 
 ## Installation & Setup
 
-1. **Presets Directory:**
-   Copy `.preset` files to:
+1. **Presets Directory & Registration:**
+   Copy `.preset` files and `PresetIndex.index` to:
    ```
    C:\Users\<User>\Documents\MOZA Cockpit\PresetLibrary\
    ```

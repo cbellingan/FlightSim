@@ -103,7 +103,12 @@
                 "JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
                 "JF12_C152_v1.0/JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
                 "Just Flight/JF12_C152_v1.0/JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
-                "Cessna C152": "{c1520000-3e98-444a-aaed-a13cd669052f}"
+                "Cessna C152": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Aircraft/Just Flight/JF12_C152_v1.0/JF_C152.acf": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna 152": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna 152 for X-Plane 11": "{c1520000-3e98-444a-aaed-a13cd669052f}",
+                "Aircraft/Laminar Research/Cessna 172 SP/Cessna_172SP.acf": "{c1720000-3e98-444a-aaed-a13cd669052f}",
+                "Cessna Skyhawk": "{c1720000-3e98-444a-aaed-a13cd669052f}"
             }
         }
     },

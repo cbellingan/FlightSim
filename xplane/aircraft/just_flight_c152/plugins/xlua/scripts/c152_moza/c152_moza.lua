@@ -1,6 +1,7 @@
 --
 -- JUST FLIGHT CESSNA 152 - MOZA AY210 INTEGRATION SCRIPT
 -- Combined Master ALT/BAT, Avionics->Pitot, Rotary Magnetos & Authentic O-235-L2C Mag Drop
+-- MOZA Gear Switch to Parking Brake Set/Disengage
 --
 
 -- DATAREFS
@@ -13,6 +14,7 @@ simDR_engine_rpm       = find_dataref("sim/cockpit2/engine/indicators/engine_spe
 simDR_override_thro    = find_dataref("sim/operation/override/override_throttles")
 simDR_engn_thro        = find_dataref("sim/flightmodel/engine/ENGN_thro[0]")
 simDR_engn_thro_use    = find_dataref("sim/flightmodel/engine/ENGN_thro_use[0]")
+simDR_park_brake       = find_dataref("sim/cockpit2/controls/parking_brake_ratio")
 
 thrandaDR_starter_key  = find_dataref("thranda/starter_key1")
 thrandaDR_hidepilot    = find_dataref("thranda/views/hidepilot")
@@ -119,7 +121,25 @@ simCMD_mag_both_wrap  = wrap_command("sim/magnetos/magnetos_both",    C152_mag_b
 simCMD_mag_both1_wrap = wrap_command("sim/magnetos/magnetos_both_1",  C152_mag_both_before,  nil)
 simCMD_starter_wrap   = wrap_command("sim/starters/engage_starter_1", C152_starter_before,   nil)
 
--- 4. RUNTIME PHYSICS & PILOT SUPPRESSION
+-- 4. PARKING BRAKE COMMAND HANDLERS (MOZA GEAR SWITCH INTEGRATION)
+function C152_park_brake_set_before(phase, duration)
+	if phase == 0 or phase == 1 then
+		if simDR_park_brake ~= nil then simDR_park_brake = 1.0 end
+	end
+	return 0
+end
+
+function C152_park_brake_rel_before(phase, duration)
+	if phase == 0 or phase == 1 then
+		if simDR_park_brake ~= nil then simDR_park_brake = 0.0 end
+	end
+	return 0
+end
+
+simCMD_pb_set_wrap = wrap_command("sim/flight_controls/park_brake_set",     C152_pb_set_before, nil)
+simCMD_pb_rel_wrap = wrap_command("sim/flight_controls/park_brake_release", C152_pb_rel_before, nil)
+
+-- 5. RUNTIME PHYSICS & PILOT SUPPRESSION
 function before_physics()
 	-- Suppress pilot renders if datarefs are exposed by SASL
 	if thrandaDR_hidepilot ~= nil and thrandaDR_hidepilot ~= 1 then

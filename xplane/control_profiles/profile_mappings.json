@@ -25,6 +25,10 @@
     "P acf_profile Cessna___Skyhawk C172___-___MOZA___AY210",
     "P acf_profile Cessna___C152 C152___-___MOZA___AY210",
     "P acf_profile JF_C152 C152___-___MOZA___AY210",
-    "P acf_profile Cessna___152 C152___-___MOZA___AY210"
+    "P acf_profile Cessna___152 C152___-___MOZA___AY210",
+    "P acf_profile Aircraft/Just___Flight/JF12_C152_v1.0/JF_C152.acf C152___-___MOZA___AY210",
+    "P acf_profile Just___Flight/JF12_C152_v1.0/JF_C152.acf C152___-___MOZA___AY210",
+    "P acf_profile JF12_C152_v1.0 C152___-___MOZA___AY210",
+    "P acf_profile Cessna___152___for___X-Plane___11 C152___-___MOZA___AY210"
   ]
 }
