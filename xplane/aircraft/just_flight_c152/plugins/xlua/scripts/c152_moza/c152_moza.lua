@@ -2,6 +2,7 @@
 -- JUST FLIGHT CESSNA 152 - MOZA AY210 INTEGRATION SCRIPT
 -- Combined Master ALT/BAT, Avionics->Pitot, Rotary Magnetos & Authentic O-235-L2C Mag Drop
 -- MOZA Gear Switch to Parking Brake Set/Disengage
+-- Auto-disable Tie-downs, Chocks, Tow bar, and Pitot Covers
 --
 
 -- DATAREFS
@@ -19,6 +20,13 @@ simDR_park_brake       = find_dataref("sim/cockpit2/controls/parking_brake_ratio
 thrandaDR_starter_key  = find_dataref("thranda/starter_key1")
 thrandaDR_hidepilot    = find_dataref("thranda/views/hidepilot")
 thrandaDR_hidecopilot  = find_dataref("thranda/views/hidecopilot")
+thrandaDR_chockL       = find_dataref("thranda/views/chockL")
+thrandaDR_chockN       = find_dataref("thranda/views/chockN")
+thrandaDR_chockR       = find_dataref("thranda/views/chockR")
+thrandaDR_tieDownL     = find_dataref("thranda/covers/TieDownL")
+thrandaDR_tieDownR     = find_dataref("thranda/covers/TieDownR")
+thrandaDR_pitotCoverL  = find_dataref("thranda/covers/PitotCoverL")
+thrandaDR_tow          = find_dataref("thranda/Tow")
 
 -- COMMANDS
 simCMD_gen1_on         = find_command("sim/electrical/generator_1_on")
@@ -169,7 +177,7 @@ end
 simCMD_pb_set_wrap = wrap_command("sim/flight_controls/park_brake_set",     C152_park_brake_set_before, nil)
 simCMD_pb_rel_wrap = wrap_command("sim/flight_controls/park_brake_release", C152_park_brake_rel_before, nil)
 
--- 5. RUNTIME PHYSICS & COUPLING
+-- 5. RUNTIME PHYSICS, EQUIPMENT & COUPLING
 function before_physics()
 	-- Suppress pilot renders if datarefs are exposed by SASL
 	if thrandaDR_hidepilot ~= nil and thrandaDR_hidepilot ~= 1 then
@@ -178,6 +186,15 @@ function before_physics()
 	if thrandaDR_hidecopilot ~= nil and thrandaDR_hidecopilot ~= 1 then
 		thrandaDR_hidecopilot = 1
 	end
+
+	-- Suppress tie downs, chocks, tow bar, and pitot covers
+	if thrandaDR_chockL ~= nil and thrandaDR_chockL ~= 0 then thrandaDR_chockL = 0 end
+	if thrandaDR_chockN ~= nil and thrandaDR_chockN ~= 0 then thrandaDR_chockN = 0 end
+	if thrandaDR_chockR ~= nil and thrandaDR_chockR ~= 0 then thrandaDR_chockR = 0 end
+	if thrandaDR_tieDownL ~= nil and thrandaDR_tieDownL ~= 0 then thrandaDR_tieDownL = 0 end
+	if thrandaDR_tieDownR ~= nil and thrandaDR_tieDownR ~= 0 then thrandaDR_tieDownR = 0 end
+	if thrandaDR_pitotCoverL ~= nil and thrandaDR_pitotCoverL ~= 0 then thrandaDR_pitotCoverL = 0 end
+	if thrandaDR_tow ~= nil and thrandaDR_tow ~= 0 then thrandaDR_tow = 0 end
 
 	-- Master ALT + BAT interlock (Mechanical switch link)
 	if simDR_battery_on ~= nil and simDR_generator_on ~= nil then
