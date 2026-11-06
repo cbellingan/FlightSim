@@ -25,13 +25,15 @@ _eq_pfc_fuel_cutoff 0
 _joy_unique_id0 vr/Oculus/oculus_Left
 _joy_unique_id1 vr/Oculus/oculus_Right
 _joy_unique_id2 VID:13422PID:4097
+_joy_unique_id3 VID:1240PID:58620
 _joy_location0 vr/Oculus/oculus_Left/12345_Controller_Left/none
 _joy_location1 vr/Oculus/oculus_Right/12345_Controller_Right/none
 _joy_location2 \\?\hid#vid_346e&pid_1001&mi_02#7&3accc17b&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}
+_joy_location3 \\?\hid#vid_04d8&pid_e4fc#7&39267b8e&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}
 _joy_lru_time0 1793022558
 _joy_lru_time1 1793022558
 _joy_lru_time2 1793323993
-_joy_lru_time3 0
+_joy_lru_time3 1793463284
 _joy_lru_time4 0
 _joy_lru_time5 0
 _joy_lru_time6 0
@@ -126,8 +128,8 @@ _joy_rev_axis74 0
 _joy_rev_axis75 0
 _joy_rev_axis76 0
 _joy_rev_axis77 0
-_joy_rev_axis78 0
-_joy_rev_axis79 0
+_joy_rev_axis78 1
+_joy_rev_axis79 1
 _joy_rev_axis80 0
 _joy_rev_axis81 0
 _joy_rev_axis82 0
@@ -1123,11 +1125,11 @@ _joy_lo_raw_dat71 9900000256.000000
 _joy_lo_raw_dat72 9900000256.000000
 _joy_lo_raw_dat73 9900000256.000000
 _joy_lo_raw_dat74 9900000256.000000
-_joy_lo_raw_dat75 9900000256.000000
-_joy_lo_raw_dat76 9900000256.000000
-_joy_lo_raw_dat77 9900000256.000000
-_joy_lo_raw_dat78 9900000256.000000
-_joy_lo_raw_dat79 9900000256.000000
+_joy_lo_raw_dat75 0.000000
+_joy_lo_raw_dat76 0.064516
+_joy_lo_raw_dat77 0.000000
+_joy_lo_raw_dat78 0.130987
+_joy_lo_raw_dat79 0.057674
 _joy_lo_raw_dat80 9900000256.000000
 _joy_lo_raw_dat81 9900000256.000000
 _joy_lo_raw_dat82 9900000256.000000
@@ -1623,11 +1625,11 @@ _joy_hi_raw_dat71 -9900000256.000000
 _joy_hi_raw_dat72 -9900000256.000000
 _joy_hi_raw_dat73 -9900000256.000000
 _joy_hi_raw_dat74 -9900000256.000000
-_joy_hi_raw_dat75 -9900000256.000000
-_joy_hi_raw_dat76 -9900000256.000000
-_joy_hi_raw_dat77 -9900000256.000000
-_joy_hi_raw_dat78 -9900000256.000000
-_joy_hi_raw_dat79 -9900000256.000000
+_joy_hi_raw_dat75 0.999022
+_joy_hi_raw_dat76 0.955034
+_joy_hi_raw_dat77 0.999022
+_joy_hi_raw_dat78 0.868035
+_joy_hi_raw_dat79 0.952102
 _joy_hi_raw_dat80 -9900000256.000000
 _joy_hi_raw_dat81 -9900000256.000000
 _joy_hi_raw_dat82 -9900000256.000000
@@ -4785,11 +4787,11 @@ _joy_AXIS_use71 0
 _joy_AXIS_use72 0
 _joy_AXIS_use73 0
 _joy_AXIS_use74 0
-_joy_AXIS_use75 0
-_joy_AXIS_use76 0
-_joy_AXIS_use77 0
-_joy_AXIS_use78 0
-_joy_AXIS_use79 0
+_joy_AXIS_use75 17
+_joy_AXIS_use76 11
+_joy_AXIS_use77 28
+_joy_AXIS_use78 20
+_joy_AXIS_use79 10
 _joy_AXIS_use80 0
 _joy_AXIS_use81 0
 _joy_AXIS_use82 0
@@ -5578,8 +5580,8 @@ _joy_BUTN_use364 sim/none/none
 _joy_BUTN_use365 sim/none/none
 _joy_BUTN_use366 sim/none/none
 _joy_BUTN_use367 sim/none/none
-_joy_BUTN_use368 sim/none/none
-_joy_BUTN_use369 sim/none/none
+_joy_BUTN_use368 sim/operation/reset_flight
+_joy_BUTN_use369 sim/operation/pause_toggle
 _joy_BUTN_use370 sim/none/none
 _joy_BUTN_use371 sim/none/none
 _joy_BUTN_use372 sim/magnetos/magnetos_off
@@ -8460,5 +8462,17 @@ _joy_AXIS_cmnd228 sim/none/none
 _joy_AXIS_cmnd229 sim/none/none
 _joy_AXIS_cmnd232 sim/none/none
 _joy_AXIS_cmnd233 sim/none/none
+_joy_AXIS_cmnd300 sim/none/none
+_joy_AXIS_cmnd301 sim/none/none
+_joy_AXIS_cmnd304 sim/none/none
+_joy_AXIS_cmnd305 sim/none/none
+_joy_AXIS_cmnd308 sim/none/none
+_joy_AXIS_cmnd309 sim/none/none
+_joy_AXIS_cmnd312 sim/none/none
+_joy_AXIS_cmnd313 sim/none/none
+_joy_AXIS_cmnd316 sim/none/none
+_joy_AXIS_cmnd317 sim/none/none
 axis_response_curve56 INTERP_MODE CATMULL_ROM | 0.000000 0.000000  | 0.250000 0.160000  | 0.500000 0.400000  | 0.750000 0.680000  | 1.000000 1.000000 
 axis_response_curve57 INTERP_MODE CATMULL_ROM | 0.000000 0.000000  | 0.250000 0.180000  | 0.500000 0.420000  | 0.750000 0.700000  | 1.000000 1.000000 
+axis_response_curve75 INTERP_MODE CATMULL_ROM | 0.000000 0.000000  | 0.250000 0.200000  | 0.500000 0.500000  | 0.750000 0.800000  | 1.000000 1.000000 
+axis_response_curve76 INTERP_MODE LINEAR | 0.000000 0.000000  | 0.367486 0.370000  | 0.663934 0.720000  | 1.000000 0.979042 

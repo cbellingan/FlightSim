@@ -34,6 +34,8 @@ num_batteries = find_dataref("sim/aircraft/electrical/num_batteries") -- we use 
 
 battery_amps_c172 = create_dataref("laminar/c172/electrical/battery_amps","number") -- the instrument needle
 
+simCMD_gen1_on  = find_command("sim/electrical/generator_1_on")
+simCMD_gen1_off = find_command("sim/electrical/generator_1_off")
 
 
 
@@ -50,6 +52,7 @@ function bat1_on_after(phase, duration)
 	if phase == 0 then
 		battery_on = 1
 		generator_on = 1
+		if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
 		batteryPREV = 1
 		generatorPREV = 1
 	end
@@ -60,6 +63,7 @@ function bat1_off_after(phase, duration)
 	if phase == 0 then
 		battery_on = 0
 		generator_on = 0
+		if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
 		batteryPREV = 0
 		generatorPREV = 0
 	end
@@ -141,8 +145,14 @@ function after_physics()
 
 	-- ALT/BAT MASTER SWITCHES LOGIC (SYNC BOTH ON & OFF)
 	if batteryPREV ~= battery_on then
-		if battery_on == 0 then generator_on = 0 end
-		if battery_on == 1 then generator_on = 1 end
+		if battery_on == 0 then
+			generator_on = 0
+			if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
+		end
+		if battery_on == 1 then
+			generator_on = 1
+			if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
+		end
 	end
 	if generatorPREV ~= generator_on then
 		if generator_on == 1 then battery_on = 1 end

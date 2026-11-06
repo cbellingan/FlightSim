@@ -20,11 +20,21 @@ thrandaDR_starter_key  = find_dataref("thranda/starter_key1")
 thrandaDR_hidepilot    = find_dataref("thranda/views/hidepilot")
 thrandaDR_hidecopilot  = find_dataref("thranda/views/hidecopilot")
 
--- 1. COMBINED MASTER ALT / BAT (MOZA BATT SWITCH)
+-- COMMANDS
+simCMD_gen1_on         = find_command("sim/electrical/generator_1_on")
+simCMD_gen1_off        = find_command("sim/electrical/generator_1_off")
+
+-- 1. COMBINED MASTER ALT / BAT (MOZA BATT SWITCH & COCKPIT SPLIT ROCKER INTERLOCK)
+local batteryPREV      = -1
+local generatorPREV    = -1
+
 function C152_bat_on_before(phase, duration)
 	if phase == 0 or phase == 1 then
 		if simDR_battery_on ~= nil then simDR_battery_on = 1 end
 		if simDR_generator_on ~= nil then simDR_generator_on = 1 end
+		if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
+		batteryPREV = 1
+		generatorPREV = 1
 	end
 	return 0
 end
@@ -33,15 +43,35 @@ function C152_bat_off_before(phase, duration)
 	if phase == 0 or phase == 1 then
 		if simDR_battery_on ~= nil then simDR_battery_on = 0 end
 		if simDR_generator_on ~= nil then simDR_generator_on = 0 end
+		if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
+		batteryPREV = 0
+		generatorPREV = 0
 	end
 	return 0
 end
 
-simCMD_bat1_on_wrap  = wrap_command("sim/electrical/battery_1_on",   C152_bat_on_before,  nil)
-simCMD_bat_all_on    = wrap_command("sim/electrical/battery_all_on", C152_bat_on_before,  nil)
-simCMD_bat1_off_wrap = wrap_command("sim/electrical/battery_1_off",  C152_bat_off_before, nil)
-simCMD_bat2_off_wrap = wrap_command("sim/electrical/battery_2_off",  C152_bat_off_before, nil)
-simCMD_bat_all_off   = wrap_command("sim/electrical/battery_all_off", C152_bat_off_before, nil)
+function C152_bat_tog_before(phase, duration)
+	if phase == 0 then
+		local new_state = (simDR_battery_on == 1) and 0 or 1
+		if simDR_battery_on ~= nil then simDR_battery_on = new_state end
+		if simDR_generator_on ~= nil then simDR_generator_on = new_state end
+		if new_state == 1 then
+			if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
+		else
+			if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
+		end
+		batteryPREV = new_state
+		generatorPREV = new_state
+	end
+	return 0
+end
+
+simCMD_bat1_on_wrap   = wrap_command("sim/electrical/battery_1_on",     C152_bat_on_before,  nil)
+simCMD_bat_all_on     = wrap_command("sim/electrical/battery_all_on",   C152_bat_on_before,  nil)
+simCMD_bat1_off_wrap  = wrap_command("sim/electrical/battery_1_off",    C152_bat_off_before, nil)
+simCMD_bat2_off_wrap  = wrap_command("sim/electrical/battery_2_off",    C152_bat_off_before, nil)
+simCMD_bat_all_off    = wrap_command("sim/electrical/battery_all_off",  C152_bat_off_before, nil)
+simCMD_bat1_tog_wrap  = wrap_command("sim/electrical/battery_1_toggle", C152_bat_tog_before, nil)
 
 -- 2. AVIONICS / PITOT LINKING
 function C152_pitot_on_before(phase, duration)
@@ -136,10 +166,10 @@ function C152_park_brake_rel_before(phase, duration)
 	return 0
 end
 
-simCMD_pb_set_wrap = wrap_command("sim/flight_controls/park_brake_set",     C152_pb_set_before, nil)
-simCMD_pb_rel_wrap = wrap_command("sim/flight_controls/park_brake_release", C152_pb_rel_before, nil)
+simCMD_pb_set_wrap = wrap_command("sim/flight_controls/park_brake_set",     C152_park_brake_set_before, nil)
+simCMD_pb_rel_wrap = wrap_command("sim/flight_controls/park_brake_release", C152_park_brake_rel_before, nil)
 
--- 5. RUNTIME PHYSICS & PILOT SUPPRESSION
+-- 5. RUNTIME PHYSICS & COUPLING
 function before_physics()
 	-- Suppress pilot renders if datarefs are exposed by SASL
 	if thrandaDR_hidepilot ~= nil and thrandaDR_hidepilot ~= 1 then
@@ -147,6 +177,35 @@ function before_physics()
 	end
 	if thrandaDR_hidecopilot ~= nil and thrandaDR_hidecopilot ~= 1 then
 		thrandaDR_hidecopilot = 1
+	end
+
+	-- Master ALT + BAT interlock (Mechanical switch link)
+	if simDR_battery_on ~= nil and simDR_generator_on ~= nil then
+		if batteryPREV == -1 then
+			batteryPREV = simDR_battery_on
+			generatorPREV = simDR_generator_on
+		end
+
+		if simDR_battery_on ~= batteryPREV then
+			simDR_generator_on = simDR_battery_on
+			if simDR_battery_on == 1 then
+				if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
+			else
+				if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
+			end
+			batteryPREV = simDR_battery_on
+			generatorPREV = simDR_generator_on
+		elseif simDR_battery_on == 1 and simDR_generator_on == 0 and generatorPREV == 0 then
+			simDR_generator_on = 1
+			if simCMD_gen1_on ~= nil then command_once(simCMD_gen1_on) end
+			generatorPREV = 1
+		elseif simDR_battery_on == 0 and simDR_generator_on == 1 and generatorPREV == 1 then
+			simDR_generator_on = 0
+			if simCMD_gen1_off ~= nil then command_once(simCMD_gen1_off) end
+			generatorPREV = 0
+		else
+			generatorPREV = simDR_generator_on
+		end
 	end
 
 	-- Authentic C152 Lycoming O-235-L2C run-up magneto drop (~65-75 RPM drop at 1700 RPM)
