@@ -15,7 +15,10 @@ simDR_engine_rpm       = find_dataref("sim/cockpit2/engine/indicators/engine_spe
 simDR_override_thro    = find_dataref("sim/operation/override/override_throttles")
 simDR_engn_thro        = find_dataref("sim/flightmodel/engine/ENGN_thro[0]")
 simDR_engn_thro_use    = find_dataref("sim/flightmodel/engine/ENGN_thro_use[0]")
-simDR_park_brake       = find_dataref("sim/cockpit2/controls/parking_brake_ratio")
+simDR_park_brake       = find_dataref("sim/flightmodel/controls/parkbrake")
+if simDR_park_brake == nil then
+	simDR_park_brake   = find_dataref("sim/cockpit2/controls/parking_brake_ratio")
+end
 
 thrandaDR_starter_key  = find_dataref("thranda/starter_key1")
 thrandaDR_hidepilot    = find_dataref("thranda/views/hidepilot")
@@ -177,8 +180,99 @@ end
 simCMD_pb_set_wrap = wrap_command("sim/flight_controls/park_brake_set",     C152_park_brake_set_before, nil)
 simCMD_pb_rel_wrap = wrap_command("sim/flight_controls/park_brake_release", C152_park_brake_rel_before, nil)
 
--- 5. RUNTIME PHYSICS, EQUIPMENT & COUPLING
+-- 5. GROUND EQUIPMENT & TIEDOWNS (S1 BUTTON / XP CHOCKS INTEGRATION)
+local ground_cleared_on_spawn = false
+
+function resolve_ground_datarefs()
+	if thrandaDR_chockL == nil then thrandaDR_chockL = find_dataref("thranda/views/chockL") end
+	if thrandaDR_chockN == nil then thrandaDR_chockN = find_dataref("thranda/views/chockN") end
+	if thrandaDR_chockR == nil then thrandaDR_chockR = find_dataref("thranda/views/chockR") end
+	if thrandaDR_tieDownL == nil then thrandaDR_tieDownL = find_dataref("thranda/covers/TieDownL") end
+	if thrandaDR_tieDownR == nil then thrandaDR_tieDownR = find_dataref("thranda/covers/TieDownR") end
+	if thrandaDR_pitotCoverL == nil then thrandaDR_pitotCoverL = find_dataref("thranda/covers/PitotCoverL") end
+	if thrandaDR_tow == nil then thrandaDR_tow = find_dataref("thranda/Tow") end
+	if thrandaDR_hidepilot == nil then thrandaDR_hidepilot = find_dataref("thranda/views/hidepilot") end
+	if thrandaDR_hidecopilot == nil then thrandaDR_hidecopilot = find_dataref("thranda/views/hidecopilot") end
+end
+
+function clear_all_ground_equipment()
+	resolve_ground_datarefs()
+	if thrandaDR_chockL ~= nil then thrandaDR_chockL = 0 end
+	if thrandaDR_chockN ~= nil then thrandaDR_chockN = 0 end
+	if thrandaDR_chockR ~= nil then thrandaDR_chockR = 0 end
+	if thrandaDR_tieDownL ~= nil then thrandaDR_tieDownL = 0 end
+	if thrandaDR_tieDownR ~= nil then thrandaDR_tieDownR = 0 end
+	if thrandaDR_pitotCoverL ~= nil then thrandaDR_pitotCoverL = 0 end
+	if thrandaDR_tow ~= nil then thrandaDR_tow = 0 end
+end
+
+function toggle_ground_equipment()
+	resolve_ground_datarefs()
+	local any_on = false
+	if (thrandaDR_tieDownL ~= nil and thrandaDR_tieDownL > 0) or
+	   (thrandaDR_tieDownR ~= nil and thrandaDR_tieDownR > 0) or
+	   (thrandaDR_chockL ~= nil and thrandaDR_chockL > 0) or
+	   (thrandaDR_chockN ~= nil and thrandaDR_chockN > 0) or
+	   (thrandaDR_chockR ~= nil and thrandaDR_chockR > 0) or
+	   (thrandaDR_pitotCoverL ~= nil and thrandaDR_pitotCoverL > 0) or
+	   (thrandaDR_tow ~= nil and thrandaDR_tow > 0) then
+		any_on = true
+	end
+
+	local target = any_on and 0 or 1
+	if thrandaDR_tieDownL ~= nil then thrandaDR_tieDownL = target end
+	if thrandaDR_tieDownR ~= nil then thrandaDR_tieDownR = target end
+	if thrandaDR_chockL ~= nil then thrandaDR_chockL = target end
+	if thrandaDR_chockN ~= nil then thrandaDR_chockN = target end
+	if thrandaDR_chockR ~= nil then thrandaDR_chockR = target end
+	if thrandaDR_pitotCoverL ~= nil then thrandaDR_pitotCoverL = target end
+	if thrandaDR_tow ~= nil then thrandaDR_tow = 0 end
+end
+
+function C152_toggle_chocks_before(phase, duration)
+	if phase == 0 then
+		toggle_ground_equipment()
+	end
+	return 0
+end
+
+function C152_remove_chocks_before(phase, duration)
+	if phase == 0 then
+		clear_all_ground_equipment()
+	end
+	return 0
+end
+
+simCMD_chocks_tog_wrap = wrap_command("sim/flight_controls/toggle_chocks", C152_toggle_chocks_before, nil)
+simCMD_chocks_rem_wrap = wrap_command("sim/flight_controls/remove_chocks", C152_remove_chocks_before, nil)
+
+function c152_cmd_toggle_ground_eq(phase, duration)
+	if phase == 0 then
+		toggle_ground_equipment()
+	end
+	return 0
+end
+
+function c152_cmd_remove_ground_eq(phase, duration)
+	if phase == 0 then
+		clear_all_ground_equipment()
+	end
+	return 0
+end
+
+create_command("c152/ground/toggle_tiedowns_chocks", "C152 Toggle Tiedowns and Chocks", c152_cmd_toggle_ground_eq)
+create_command("c152/ground/remove_tiedowns_chocks", "C152 Remove All Tiedowns and Chocks", c152_cmd_remove_ground_eq)
+
+function flight_start()
+	ground_cleared_on_spawn = false
+	resolve_ground_datarefs()
+	clear_all_ground_equipment()
+end
+
+-- 6. RUNTIME PHYSICS, EQUIPMENT & COUPLING
 function before_physics()
+	resolve_ground_datarefs()
+
 	-- Suppress pilot renders if datarefs are exposed by SASL
 	if thrandaDR_hidepilot ~= nil and thrandaDR_hidepilot ~= 1 then
 		thrandaDR_hidepilot = 1
@@ -187,14 +281,13 @@ function before_physics()
 		thrandaDR_hidecopilot = 1
 	end
 
-	-- Suppress tie downs, chocks, tow bar, and pitot covers
-	if thrandaDR_chockL ~= nil and thrandaDR_chockL ~= 0 then thrandaDR_chockL = 0 end
-	if thrandaDR_chockN ~= nil and thrandaDR_chockN ~= 0 then thrandaDR_chockN = 0 end
-	if thrandaDR_chockR ~= nil and thrandaDR_chockR ~= 0 then thrandaDR_chockR = 0 end
-	if thrandaDR_tieDownL ~= nil and thrandaDR_tieDownL ~= 0 then thrandaDR_tieDownL = 0 end
-	if thrandaDR_tieDownR ~= nil and thrandaDR_tieDownR ~= 0 then thrandaDR_tieDownR = 0 end
-	if thrandaDR_pitotCoverL ~= nil and thrandaDR_pitotCoverL ~= 0 then thrandaDR_pitotCoverL = 0 end
-	if thrandaDR_tow ~= nil and thrandaDR_tow ~= 0 then thrandaDR_tow = 0 end
+	-- Auto-clear tiedowns and chocks on initial aircraft load
+	if not ground_cleared_on_spawn then
+		if thrandaDR_tieDownL ~= nil or thrandaDR_chockL ~= nil then
+			clear_all_ground_equipment()
+			ground_cleared_on_spawn = true
+		end
+	end
 
 	-- Master ALT + BAT interlock (Mechanical switch link)
 	if simDR_battery_on ~= nil and simDR_generator_on ~= nil then
