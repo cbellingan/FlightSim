@@ -30,6 +30,9 @@ thrandaDR_tieDownL     = find_dataref("thranda/covers/TieDownL")
 thrandaDR_tieDownR     = find_dataref("thranda/covers/TieDownR")
 thrandaDR_pitotCoverL  = find_dataref("thranda/covers/PitotCoverL")
 thrandaDR_tow          = find_dataref("thranda/Tow")
+thrandaDR_pitch_feel   = find_dataref("thranda/flightmodel/PitchFeel")
+thrandaDR_roll_feel    = find_dataref("thranda/flightmodel/RollFeel")
+thrandaDR_yaw_feel     = find_dataref("thranda/flightmodel/YawFeel")
 
 -- COMMANDS
 simCMD_gen1_on         = find_command("sim/electrical/generator_1_on")
@@ -193,6 +196,9 @@ function resolve_ground_datarefs()
 	if thrandaDR_tow == nil then thrandaDR_tow = find_dataref("thranda/Tow") end
 	if thrandaDR_hidepilot == nil then thrandaDR_hidepilot = find_dataref("thranda/views/hidepilot") end
 	if thrandaDR_hidecopilot == nil then thrandaDR_hidecopilot = find_dataref("thranda/views/hidecopilot") end
+	if thrandaDR_pitch_feel == nil then thrandaDR_pitch_feel = find_dataref("thranda/flightmodel/PitchFeel") end
+	if thrandaDR_roll_feel == nil then thrandaDR_roll_feel = find_dataref("thranda/flightmodel/RollFeel") end
+	if thrandaDR_yaw_feel == nil then thrandaDR_yaw_feel = find_dataref("thranda/flightmodel/YawFeel") end
 end
 
 function clear_all_ground_equipment()
@@ -287,6 +293,17 @@ function before_physics()
 			clear_all_ground_equipment()
 			ground_cleared_on_spawn = true
 		end
+	end
+
+	-- Enforce authentic C152 DynaFeel flight model damping & stability (0.50)
+	if thrandaDR_roll_feel ~= nil and thrandaDR_roll_feel > 0.55 then
+		thrandaDR_roll_feel = 0.50
+	end
+	if thrandaDR_yaw_feel ~= nil and thrandaDR_yaw_feel > 0.55 then
+		thrandaDR_yaw_feel = 0.50
+	end
+	if thrandaDR_pitch_feel ~= nil and thrandaDR_pitch_feel > 0.55 then
+		thrandaDR_pitch_feel = 0.50
 	end
 
 	-- Master ALT + BAT interlock (Mechanical switch link)
