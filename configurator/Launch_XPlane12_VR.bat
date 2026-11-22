@@ -5,7 +5,10 @@ echo   X-Plane 12 + Meta Quest Pro + OFXR-Bridge + XPME VR Launcher
 echo   Hardware Profile: Intel Core i9-9900K ^| RTX 5070 Ti 16GB ^| 64GB RAM
 echo ============================================================================
 echo.
-echo [1/4] Ensuring X-Plane Map Enhancement (XPME) is running...
+echo [1/5] Ensuring VR profile is applied (_eq_vr 1, 2560x1440 Trainer Window)...
+python "C:\Users\cb\.gemini\antigravity\scratch\xplane-quest3-configurator\configurator.py" --apply-preset quest_pro_rtx5070ti_ultra
+echo.
+echo [2/5] Ensuring X-Plane Map Enhancement (XPME) is running...
 tasklist /FI "IMAGENAME eq XPlaneMapEnhancement.exe" 2>NUL | find /I /N "XPlaneMapEnhancement.exe">NUL
 if "%ERRORLEVEL%"=="0" (
     echo       - XPME is already running and streaming scenery from C:\XPME\base.
@@ -19,7 +22,7 @@ if "%ERRORLEVEL%"=="0" (
     )
 )
 echo.
-echo [2/4] Applying Meta Quest Pro OpenXR / Link optimizations via OculusDebugToolCLI...
+echo [3/5] Applying Meta Quest Pro OpenXR / Link optimizations via OculusDebugToolCLI...
 echo       - FOV Tangent Multiplier : 0.80 x 0.74
 echo       - Pixel Density Override : 1.30x (SuperSampled Instrument Text)
 echo       - Layer Mip-Bias Sharpen : Enabled
@@ -30,10 +33,10 @@ if exist "C:\Program Files\Meta Horizon\Support\oculus-diagnostics\OculusDebugTo
     echo [WARN] OculusDebugToolCLI not found at "C:\Program Files\Meta Horizon\Support\oculus-diagnostics\OculusDebugToolCLI.exe"
 )
 echo.
-echo [3/4] Ensuring OFXR-Bridge 0.3.1 Optical Flow Tray is armed...
+echo [4/5] Ensuring OFXR-Bridge 0.3.1 Optical Flow Tray is armed...
 schtasks.exe /Run /TN "OFXRBridgeTrayLaunch" >nul 2>&1
 echo.
-echo [4/4] Starting X-Plane 12...
+echo [5/5] Starting X-Plane 12 in VR...
 schtasks.exe /Run /TN "XPlaneDirectLaunch" >nul 2>&1
 if errorlevel 1 (
     cd /d "C:\X-Plane 12"

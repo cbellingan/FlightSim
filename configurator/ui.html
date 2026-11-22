@@ -1025,6 +1025,7 @@
       list.forEach(p => {
         const div = document.createElement('div');
         div.className = 'preset-card' + (p.id === selectedPresetId ? ' active' : '');
+        div.dataset.presetId = p.id;
         div.onclick = () => selectPreset(p.id);
         const ofxrBadge = (p.ofxr_settings && p.ofxr_settings.armed) ? '🟢 OFXR ON' : '⚪ OFXR OFF';
         const is5070 = p.id.indexOf('5070ti') !== -1;
@@ -1176,7 +1177,7 @@
 
     let currentTargetMode = 'vr';
 
-    function switchTargetMode(mode) {
+    async function switchTargetMode(mode) {
       currentTargetMode = mode;
       const btnVr = document.getElementById('btn-mode-vr');
       const btn2d = document.getElementById('btn-mode-2d');
@@ -1198,6 +1199,28 @@
         selectPreset('quest_pro_rtx5070ti_ultra');
       }
       recalc();
+
+      showToast(mode === '2d'
+        ? '🖥️ <strong>Switching to 2D Ultrawide Monitor Mode...</strong><br/>Applying Fullscreen 5120×2160 and disarming VR/OFXR...'
+        : '🥽 <strong>Switching to VR Headset Mode...</strong><br/>Applying Meta Quest Pro profile, 2560×1440 Trainer Window, and arming OFXR...');
+
+      try {
+        const res = await fetch('/api/switch_mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          appState = data.state;
+          renderDashboard();
+          showToast(mode === '2d'
+            ? '🖥️ <strong>2D Ultrawide Mode Active!</strong><br/>Preferences set to Fullscreen 5120×2160, VR disabled (<code>_eq_vr 0</code>), OFXR disarmed.'
+            : '🥽 <strong>VR Headset Mode Active!</strong><br/>Preferences set to Quest Pro (<code>_eq_vr 1</code>), 2560×1440 Trainer Window, OFXR armed.');
+        }
+      } catch (err) {
+        console.error('Error switching target mode:', err);
+      }
     }
 
     function onTrainerSizeChange() {
@@ -1211,7 +1234,7 @@
 
     function selectPreset(id) {
       selectedPresetId = id;
-      const p = appState.presets[id];
+      const p = (appState && appState.presets) ? appState.presets[id] : null;
       if (!p) return;
 
       if (id === 'desktop_ultrawide') {
@@ -1236,10 +1259,10 @@
         }
       }
 
-      document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
-      const cards = document.querySelectorAll('.preset-card');
-      const idx = Object.keys(appState.presets).indexOf(id);
-      if (cards[idx]) cards[idx].classList.add('active');
+      document.querySelectorAll('.preset-card').forEach(c => {
+        if (c.dataset.presetId === id) c.classList.add('active');
+        else c.classList.remove('active');
+      });
 
       const s = p.xp_settings;
       setVal('xp__vr_separate_graphics_settings', s._vr_separate_graphics_settings ?? 1);
@@ -1417,18 +1440,36 @@
         winH = parseInt(parts[1], 10) || 1440;
       }
 
+      const is2d = (currentTargetMode === '2d') || (selectedPresetId === 'desktop_ultrawide');
+      const eqVr = is2d ? 0 : 1;
+
       return {
         preset_id: selectedPresetId,
+        target_mode: is2d ? '2d' : 'vr',
         xp_settings: {
+          _eq_vr: eqVr,
           _vr_separate_graphics_settings: parseInt(document.getElementById('xp__vr_separate_graphics_settings').value, 10),
-          _vr_vrs_enable: vrs,
+          _vr_vrs_enable: is2d ? 0 : vrs,
           _vr_vrs_preset: vrs ? 2 : 1,
           _vr_depth_reprojection: 1,
           _vr_runtime_id: 'openxr',
           _rcas_ratio: parseFloat(document.getElementById('xp__rcas_ratio').value),
           _fms_per_frame: 2,
-          _tex_res: Math.min(4, texRes + 1),
+          _tex_res: Math.min(5, texRes + 1),
           renopt_tex_res_04: texRes,
+          renopt_FSR_04: is2d ? 0 : parseInt(document.getElementById('xp_vr_renopt_FSR_04').value, 10),
+          renopt_MSAA: is2d ? 1 : 0,
+          renopt_FXAA: 0,
+          renopt_SSAO_04: 1,
+          renopt_clouds_02: parseInt(document.getElementById('xp_vr_renopt_clouds_02').value, 10),
+          renopt_draw_3d_04: parseInt(document.getElementById('xp_vr_renopt_draw_3d_04').value, 10),
+          renopt_draw_distance04: parseInt(document.getElementById('xp_vr_renopt_draw_distance04').value, 10),
+          renopt_shadow_quality_04: parseInt(document.getElementById('xp_vr_renopt_shadow_quality_04').value, 10),
+          renopt_vegetation_3d: veg3d,
+          renopt_vegetation_quality_04: veg3d ? 3 : 1,
+          renopt_ANISO: 16,
+          renopt_static_acf: is2d ? 1 : 0,
+          renopt_boats: 1,
           vr_renopt_tex_res_04: texRes,
           vr_renopt_FSR_04: parseInt(document.getElementById('xp_vr_renopt_FSR_04').value, 10),
           vr_renopt_MSAA: 0,
@@ -1522,18 +1563,17 @@
 
     async function launchSim(mode) {
       if (mode === '2d') {
-        switchTargetMode('2d');
+        await switchTargetMode('2d');
       } else {
-        switchTargetMode('vr');
+        await switchTargetMode('vr');
       }
-      await applySettings();
       showToast(mode === 'vr' 
         ? '🥽 <strong>Starting VR Session...</strong><br/>Optimizing for Meta Quest Pro + OFXR-Bridge + XPME.'
         : '🖥️ <strong>Starting 2D Ultrawide Session...</strong><br/>Optimizing for 5120×2160 Fullscreen + XPME.');
       const res = await fetch('/api/launch_xp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: mode })
+        body: JSON.stringify({ mode: mode, restart_if_running: true })
       });
       const data = await res.json();
       if (data.ok) {
