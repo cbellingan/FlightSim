@@ -167,8 +167,9 @@ def compose_profile(vr_id="quest_pro", gpu_id="rtx_5070ti_16gb", hw_id="i9_9900k
 
     window_settings = {
         "windowed_for_vr": True,
-        "width": 1280,
-        "height": 720,
+        "width": 2560,
+        "height": 1440,
+        "trainer_size": "2560x1440",
     }
 
     return {
@@ -228,8 +229,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_pro",
@@ -293,8 +295,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_3",
@@ -360,8 +363,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_pro",
@@ -425,8 +429,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_pro",
@@ -490,8 +495,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_pro",
@@ -555,8 +561,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_pro",
@@ -620,8 +627,9 @@ PRESETS = {
         },
         "window_settings": {
             "windowed_for_vr": True,
-            "width": 1280,
-            "height": 720,
+            "width": 2560,
+            "height": 1440,
+            "trainer_size": "2560x1440",
         },
         "quest_settings": {
             "headset_target": "quest_3",
@@ -653,26 +661,27 @@ PRESETS = {
     "desktop_ultrawide": {
         "id": "desktop_ultrawide",
         "name": "2D Ultrawide 5120×2160 Mode (Non-VR)",
-        "badge": "5K2K Monitor",
+        "badge": "5K2K Monitor • Fullscreen",
         "description": (
-            "Restores Fullscreen 5120×2160 monitor resolution with FSR Quality and High Textures tuned for "
-            "2D monitor flying on the RTX 2070, while disarming OFXR-Bridge and preserving your VR profile."
+            "Optimized for 2D flying on your 5120×2160 5K2K Ultrawide monitor with NVIDIA RTX 5070 Ti (16GB): "
+            "Maximum uncompressed textures, native resolution with 2x MSAA & 16x Anisotropic filtering, high 3D world objects, "
+            "maximum volumetric clouds, and disarming OFXR-Bridge for pure desktop Vulkan performance."
         ),
         "xp_settings": {
             "_vr_separate_graphics_settings": 1,
-            "_rcas_ratio": 0.450000,
-            "_tex_res": 4,
-            "renopt_tex_res_04": 3,
-            "renopt_FSR_04": 1,
-            "renopt_MSAA": 0,
-            "renopt_FXAA": 1,
+            "_rcas_ratio": 0.50,
+            "_tex_res": 5,
+            "renopt_tex_res_04": 4,          # Maximum Textures on 16GB VRAM
+            "renopt_FSR_04": 0,              # Native 5K2K
+            "renopt_MSAA": 1,                # 2x MSAA for crisp edge clarity
+            "renopt_FXAA": 0,
             "renopt_SSAO_04": 1,
-            "renopt_clouds_02": 2,
-            "renopt_shadow_quality_04": 1,
+            "renopt_clouds_02": 3,           # Maximum Clouds
+            "renopt_shadow_quality_04": 2,   # High Shadows
             "renopt_draw_distance04": 3,
-            "renopt_draw_3d_04": 3,
+            "renopt_draw_3d_04": 3,          # High World Objects
             "renopt_vegetation_3d": 1,
-            "renopt_vegetation_quality_04": 2,
+            "renopt_vegetation_quality_04": 3,
             "renopt_ANISO": 16,
             "renopt_static_acf": 1,
             "renopt_boats": 1,
@@ -681,9 +690,10 @@ PRESETS = {
             "windowed_for_vr": False,
             "width": 5120,
             "height": 2160,
+            "trainer_size": "fullscreen",
         },
         "quest_settings": {
-            "headset_target": "quest_pro",
+            "headset_target": "none",
             "fov_x": 1.0,
             "fov_y": 1.0,
             "ppdp": 1.0,
@@ -696,14 +706,14 @@ PRESETS = {
             "num_slices": 5,
             "dynamic_bitrate": 0,
             "video_codec": "h264",
-            "local_dimming": 1,
+            "local_dimming": 0,
         },
         "ofxr_settings": {
             "armed": False,
             "backend": 2,
             "preset": 1,
             "scale": 2,
-            "lower_vram": 1,
+            "lower_vram": 0,
             "triple_frame_gen": 0,
             "overlay_position": 0,
             "diagnostics": 0,
@@ -1394,18 +1404,28 @@ def update_xp_prf_files(xp_settings, window_settings):
     if XP12_WIN_PRF.exists() and window_settings:
         wlines = XP12_WIN_PRF.read_text(encoding="utf-8", errors="replace").splitlines()
         windowed = window_settings.get("windowed_for_vr", True)
-        w_width = int(window_settings.get("width", 1280))
-        w_height = int(window_settings.get("height", 720))
+        w_width = int(window_settings.get("width", 2560))
+        w_height = int(window_settings.get("height", 1440))
         mode_str = "wmgr_mode_window" if windowed else "wmgr_mode_fullscreen"
+        pos_x = max(0, (5120 - w_width) // 2) if windowed else 0
+        pos_y = max(0, (2160 - w_height) // 2) if windowed else 0
 
         new_wlines = []
         for line in wlines:
             if line.startswith("monitor/0/m_is_fullscreen "):
                 new_wlines.append(f"monitor/0/m_is_fullscreen {mode_str}")
+            elif line.startswith("monitor/0/m_window_bounds/0 ") and windowed:
+                new_wlines.append(f"monitor/0/m_window_bounds/0 {pos_x}")
+            elif line.startswith("monitor/0/m_window_bounds/1 ") and windowed:
+                new_wlines.append(f"monitor/0/m_window_bounds/1 {pos_y}")
             elif line.startswith("monitor/0/m_window_bounds/2 ") and windowed:
                 new_wlines.append(f"monitor/0/m_window_bounds/2 {w_width}")
             elif line.startswith("monitor/0/m_window_bounds/3 ") and windowed:
                 new_wlines.append(f"monitor/0/m_window_bounds/3 {w_height}")
+            elif line.startswith("monitor/0/m_arbitrary_bounds/0 ") and windowed:
+                new_wlines.append(f"monitor/0/m_arbitrary_bounds/0 {pos_x}")
+            elif line.startswith("monitor/0/m_arbitrary_bounds/1 ") and windowed:
+                new_wlines.append(f"monitor/0/m_arbitrary_bounds/1 {pos_y}")
             elif line.startswith("monitor/0/m_arbitrary_bounds/2 ") and windowed:
                 new_wlines.append(f"monitor/0/m_arbitrary_bounds/2 {w_width}")
             elif line.startswith("monitor/0/m_arbitrary_bounds/3 ") and windowed:
@@ -1569,43 +1589,96 @@ timeout /t 3 >nul
 """
     bat_path = APP_DIR / "Launch_XPlane12_VR.bat"
     bat_path.write_text(bat_content, encoding="utf-8")
+    generate_2d_launcher_bat()
     return str(bat_path)
 
 
-def launch_xplane_interactive():
-    """Launch X-Plane 12 visibly on the user's interactive desktop (WinSta0\\Default)."""
+def generate_2d_launcher_bat():
+    """Create a 1-click batch launcher for 2D Ultrawide 5K2K Monitor flying."""
+    bat_content = f"""@echo off
+title X-Plane 12 + 2D Ultrawide 5K2K Monitor Launcher
+echo ============================================================================
+echo   X-Plane 12 + 2D Ultrawide 5K2K Monitor Launcher
+echo   Hardware Profile: Intel Core i9-9900K ^| RTX 5070 Ti 16GB ^| 5120x2160
+echo ============================================================================
+echo.
+echo [1/3] Ensuring X-Plane Map Enhancement (XPME) is running...
+tasklist /FI "IMAGENAME eq XPlaneMapEnhancement.exe" 2>NUL | find /I /N "XPlaneMapEnhancement.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo       - XPME is already running and streaming scenery from C:\\XPME\\base.
+) else (
+    if exist "{XPME_EXE}" (
+        echo       - Starting XPME from {XPME_EXE}...
+        start "" "{XPME_EXE}"
+        timeout /t 3 >nul
+    ) else (
+        echo       - [NOTE] XPME executable not found at default path.
+    )
+)
+echo.
+echo [2/3] Disarming OFXR-Bridge for pure 2D monitor rendering...
+taskkill /F /IM OFXRBridgeTray.exe >nul 2>&1
+echo.
+echo [3/3] Starting X-Plane 12 in Fullscreen 5120x2160...
+schtasks.exe /Run /TN "XPlaneDirectLaunch" >nul 2>&1
+if errorlevel 1 (
+    cd /d "{XP12_DIR}"
+    explorer.exe "{XP12_EXE}"
+)
+echo Done! Enjoy flying on your 5K2K ultrawide monitor.
+timeout /t 3 >nul
+"""
+    bat_path = APP_DIR / "Launch_XPlane12_2D.bat"
+    bat_path.write_text(bat_content, encoding="utf-8")
+    return str(bat_path)
+
+
+def launch_xplane_interactive(mode="vr"):
+    """Launch X-Plane 12 visibly on the user's interactive desktop (WinSta0\\Default) for VR or 2D."""
     # 0. Ensure X-Plane Map Enhancement (XPME) is running
     ensure_xpme_running()
 
-    # 1. Re-apply live OculusDebugToolCLI settings right before launch
-    odt_script = APP_DIR / "odt_vr_startup.txt"
-    if not odt_script.exists():
-        generate_vr_launcher_bat(PRESETS[DEFAULT_PRESET_ID]["quest_settings"])
-    cli_path = get_odt_cli_path()
-    if cli_path and odt_script.exists():
+    if mode == "2d":
+        # Disarm OFXR-Bridge tray for 2D mode so it doesn't hook desktop Vulkan swapchain
         try:
             subprocess.run(
-                [str(cli_path), "-f", str(odt_script)],
-                capture_output=True,
-                timeout=6,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-        except Exception:
-            pass
-
-    # 2. If OFXR-Bridge is armed in last applied profile (or currently armed), ensure OFXRBridgeTray is running
-    ofxr_stat = read_ofxr_status()
-    if ofxr_stat.get("settings", {}).get("armed", True) and not ofxr_stat.get("tray_running"):
-        try:
-            subprocess.run(
-                ["schtasks.exe", "/Run", "/TN", "OFXRBridgeTrayLaunch"],
+                ["taskkill", "/F", "/IM", "OFXRBridgeTray.exe"],
                 capture_output=True,
                 timeout=5,
                 creationflags=subprocess.CREATE_NO_WINDOW,
             )
-            time.sleep(1.0)
         except Exception:
             pass
+    else:
+        # 1. Re-apply live OculusDebugToolCLI settings right before launch
+        odt_script = APP_DIR / "odt_vr_startup.txt"
+        if not odt_script.exists():
+            generate_vr_launcher_bat(PRESETS[DEFAULT_PRESET_ID]["quest_settings"])
+        cli_path = get_odt_cli_path()
+        if cli_path and odt_script.exists():
+            try:
+                subprocess.run(
+                    [str(cli_path), "-f", str(odt_script)],
+                    capture_output=True,
+                    timeout=6,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+            except Exception:
+                pass
+
+        # 2. If OFXR-Bridge is armed in last applied profile (or currently armed), ensure OFXRBridgeTray is running
+        ofxr_stat = read_ofxr_status()
+        if ofxr_stat.get("settings", {}).get("armed", True) and not ofxr_stat.get("tray_running"):
+            try:
+                subprocess.run(
+                    ["schtasks.exe", "/Run", "/TN", "OFXRBridgeTrayLaunch"],
+                    capture_output=True,
+                    timeout=5,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                time.sleep(1.0)
+            except Exception:
+                pass
 
     # 3. Launch X-Plane 12 via Interactive Scheduled Task (WinSta0\Default foreground window)
     try:
@@ -1625,12 +1698,13 @@ def launch_xplane_interactive():
 def apply_full_configuration(payload):
     """Backup current state and apply X-Plane + Window + Quest Pro/3 + OFXR-Bridge settings."""
     preset_id = payload.get("preset_id", DEFAULT_PRESET_ID)
+    preset_base = PRESETS.get(preset_id, {})
     backup_path = create_backup(preset_id)
 
-    xp_settings = payload.get("xp_settings", {})
-    window_settings = payload.get("window_settings", {})
-    quest_settings = payload.get("quest_settings", {})
-    ofxr_settings = payload.get("ofxr_settings", {})
+    xp_settings = payload.get("xp_settings") if "xp_settings" in payload else preset_base.get("xp_settings", {})
+    window_settings = payload.get("window_settings") if "window_settings" in payload else preset_base.get("window_settings", {})
+    quest_settings = payload.get("quest_settings") if "quest_settings" in payload else preset_base.get("quest_settings", {})
+    ofxr_settings = payload.get("ofxr_settings") if "ofxr_settings" in payload else preset_base.get("ofxr_settings", {})
 
     update_xp_prf_files(xp_settings, window_settings)
     cli_log = apply_quest_settings(quest_settings)
@@ -1730,7 +1804,6 @@ class ConfiguratorHandler(http.server.BaseHTTPRequestHandler):
             elif self.path == "/api/xpme/start":
                 ok, msg = ensure_xpme_running()
                 self._send_json({"ok": ok, "message": msg, "xpme_status": get_xpme_status()})
-                self._send_json(res)
             elif self.path == "/api/restore":
                 bname = payload.get("backup_name")
                 restore_backup(bname)
@@ -1743,8 +1816,14 @@ class ConfiguratorHandler(http.server.BaseHTTPRequestHandler):
                     subprocess.run([str(cli_path)], input=cmd, text=True, capture_output=True, timeout=5)
                 self._send_json({"ok": True, "mode": mode})
             elif self.path == "/api/launch_xp":
-                launch_xplane_interactive()
-                self._send_json({"ok": True, "message": "Launched X-Plane 12 with Quest Pro + OFXR-Bridge optimizations!"})
+                mode = payload.get("mode", "vr")
+                launch_xplane_interactive(mode=mode)
+                msg = (
+                    "Launched X-Plane 12 in VR with Meta Quest Pro + OFXR-Bridge!"
+                    if mode == "vr"
+                    else "Launched X-Plane 12 in 2D Ultrawide 5K2K Monitor Mode!"
+                )
+                self._send_json({"ok": True, "mode": mode, "message": msg})
             elif self.path == "/api/open_odt":
                 gui = get_odt_gui_path()
                 if gui:
@@ -1821,7 +1900,7 @@ def is_port_in_use(port):
 def main():
     ensure_std_streams()
     parser = argparse.ArgumentParser(description="X-Plane 12 + Meta Quest Pro + OFXR-Bridge VR Configurator")
-    parser.add_argument("--apply-preset", choices=list(PRESETS.keys()), help="Apply a preset immediately via CLI")
+    parser.add_argument("--apply-preset", "--preset", dest="apply_preset", choices=list(PRESETS.keys()), help="Apply a preset immediately via CLI")
     parser.add_argument("--status", action="store_true", help="Print hardware & config diagnostics JSON and exit")
     parser.add_argument("--port", type=int, default=8765, help="Port for Web Configurator UI (default: 8765)")
     parser.add_argument("--no-browser", action="store_true", help="Do not auto-open browser")

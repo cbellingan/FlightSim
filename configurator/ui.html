@@ -81,11 +81,71 @@
       border-color: var(--success);
     }
     .btn-success:hover { filter: brightness(1.1); }
+    .btn-blue {
+      background: #1d4ed8;
+      color: #eff6ff;
+      border-color: #3b82f6;
+    }
+    .btn-blue:hover { filter: brightness(1.15); }
     .btn-secondary {
       background: var(--panel-alt);
       color: var(--text);
     }
     .btn-secondary:hover { border-color: var(--accent); }
+    .mode-switch-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel);
+      padding: 12px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .mode-switch-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .mode-switch-title {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .mode-tab {
+      padding: 7px 16px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 7px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .mode-tab:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .mode-tab.active {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+      color: #93c5fd;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+    }
+    .mode-switch-hint {
+      font-size: 0.80rem;
+      color: var(--muted);
+    }
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -366,13 +426,31 @@
     </div>
     <div class="header-actions">
       <button class="btn-secondary" onclick="startXPME()" title="Check or start X-Plane Map Enhancement">🗺️ XPME Scenery</button>
-      <button class="btn-secondary" onclick="openODT()">🛠 Open Oculus Debug Tool</button>
-      <button class="btn-primary" onclick="applySettings()">💾 Apply &amp; Save Optimizations</button>
-      <button class="btn-success" onclick="launchXPlane()">🚀 Launch X-Plane 12 VR</button>
+      <button class="btn-secondary" onclick="openODT()" title="Open Oculus Debug Tool">🛠 Oculus Debug Tool</button>
+      <button class="btn-primary" onclick="applySettings()" title="Save current parameters to X-Plane & Oculus Link">💾 Apply &amp; Save</button>
+      <button class="btn-success" onclick="launchSim('vr')" title="Apply VR profile, arm OFXR-Bridge, and launch in VR">🥽 Launch in VR</button>
+      <button class="btn-blue" onclick="launchSim('2d')" title="Apply 2D 5K2K profile, disarm OFXR-Bridge, and launch on monitor">🖥️ Launch in 2D (5K2K)</button>
     </div>
   </header>
 
   <div class="container">
+    <!-- Display Target Mode Switcher -->
+    <div class="mode-switch-bar">
+      <div class="mode-switch-left">
+        <span class="mode-switch-title">🎯 Active Display Target:</span>
+        <div class="mode-tabs">
+          <button id="btn-mode-vr" class="mode-tab active" onclick="switchTargetMode('vr')">
+            🥽 VR Headset (Meta Quest Pro)
+          </button>
+          <button id="btn-mode-2d" class="mode-tab" onclick="switchTargetMode('2d')">
+            🖥️ 2D Ultrawide Display (5120×2160)
+          </button>
+        </div>
+      </div>
+      <div id="mode-summary-hint" class="mode-switch-hint">
+        Optimizing for <strong>Meta Quest Pro VR</strong>: 1.30x SuperSampling, OFXR Optical Flow 2X FrameGen, and large 2560×1440 Trainer Window.
+      </div>
+    </div>
     <!-- Hardware Summary Cards -->
     <div class="grid-top">
       <div class="stat-card">
@@ -489,14 +567,23 @@
 
         <div class="control-row">
           <div class="control-info">
-            <div class="control-name">2D Desktop Mirror Mode During VR</div>
-            <div class="control-hint">Running 1280×720 Windowed saves GPU cycles for VR rendering and avoids monitor scaling</div>
+            <div class="control-name">VR Desktop Trainer / Mirror Window Size (<code>X-Plane Window Positions.prf</code>)</div>
+            <div class="control-hint">Controls the 2D companion window on your 5K2K display while VR is running. 2560×1440 gives instructors/spectators a crisp, large view without taxing the RTX 5070 Ti.</div>
           </div>
           <div class="control-widget">
-            <select id="win_windowed_for_vr" onchange="recalc()">
-              <option value="true">1280×720 Windowed (Recommended for VR)</option>
-              <option value="false">5120×2160 Fullscreen (High Desktop Overhead)</option>
+            <select id="win_trainer_size" onchange="onTrainerSizeChange()">
+              <option value="2560x1440" selected>2560×1440 (QHD) — Large Trainer Window [Recommended]</option>
+              <option value="3440x1440">3440×1440 (21:9 UW) — Wide Instructor View</option>
+              <option value="1920x1080">1920×1080 (FHD) — Medium Trainer Window</option>
+              <option value="1280x720">1280×720 (HD) — Minimal Compact Window</option>
+              <option value="fullscreen">5120×2160 (Fullscreen 5K2K Monitor)</option>
+              <option value="custom">Custom Dimensions...</option>
             </select>
+            <div id="custom_win_dims" style="display:none; margin-top:6px; align-items:center; gap:6px;">
+              <input type="number" id="win_custom_w" placeholder="Width" style="width:75px; padding:4px; background:#0d131f; border:1px solid #334155; color:#fff; border-radius:4px;" value="2560" oninput="recalc()" />
+              <span style="color:var(--muted);">×</span>
+              <input type="number" id="win_custom_h" placeholder="Height" style="width:75px; padding:4px; background:#0d131f; border:1px solid #334155; color:#fff; border-radius:4px;" value="1440" oninput="recalc()" />
+            </div>
           </div>
         </div>
 
@@ -1087,10 +1174,67 @@
       recalc();
     }
 
+    let currentTargetMode = 'vr';
+
+    function switchTargetMode(mode) {
+      currentTargetMode = mode;
+      const btnVr = document.getElementById('btn-mode-vr');
+      const btn2d = document.getElementById('btn-mode-2d');
+      const hint = document.getElementById('mode-summary-hint');
+
+      if (mode === '2d') {
+        if (btnVr) btnVr.classList.remove('active');
+        if (btn2d) btn2d.classList.add('active');
+        if (hint) {
+          hint.innerHTML = 'Optimizing for <strong>2D Ultrawide Monitor</strong>: Fullscreen 5120×2160, Maximum Textures, Native Visuals, OFXR Disarmed.';
+        }
+        selectPreset('desktop_ultrawide');
+      } else {
+        if (btn2d) btn2d.classList.remove('active');
+        if (btnVr) btnVr.classList.add('active');
+        if (hint) {
+          hint.innerHTML = 'Optimizing for <strong>Meta Quest Pro VR</strong>: 1.30x SuperSampling, OFXR Optical Flow FrameGen, and large Trainer Window.';
+        }
+        selectPreset('quest_pro_rtx5070ti_ultra');
+      }
+      recalc();
+    }
+
+    function onTrainerSizeChange() {
+      const val = document.getElementById('win_trainer_size').value;
+      const customEl = document.getElementById('custom_win_dims');
+      if (customEl) {
+        customEl.style.display = val === 'custom' ? 'flex' : 'none';
+      }
+      recalc();
+    }
+
     function selectPreset(id) {
       selectedPresetId = id;
       const p = appState.presets[id];
       if (!p) return;
+
+      if (id === 'desktop_ultrawide') {
+        currentTargetMode = '2d';
+        const btnVr = document.getElementById('btn-mode-vr');
+        const btn2d = document.getElementById('btn-mode-2d');
+        const hint = document.getElementById('mode-summary-hint');
+        if (btnVr) btnVr.classList.remove('active');
+        if (btn2d) btn2d.classList.add('active');
+        if (hint) {
+          hint.innerHTML = 'Optimizing for <strong>2D Ultrawide Monitor</strong>: Fullscreen 5120×2160, Maximum Textures, Native Visuals, OFXR Disarmed.';
+        }
+      } else {
+        currentTargetMode = 'vr';
+        const btnVr = document.getElementById('btn-mode-vr');
+        const btn2d = document.getElementById('btn-mode-2d');
+        const hint = document.getElementById('mode-summary-hint');
+        if (btn2d) btn2d.classList.remove('active');
+        if (btnVr) btnVr.classList.add('active');
+        if (hint) {
+          hint.innerHTML = 'Optimizing for <strong>Meta Quest Pro VR</strong>: 1.30x SuperSampling, OFXR Optical Flow FrameGen, and large Trainer Window.';
+        }
+      }
 
       document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
       const cards = document.querySelectorAll('.preset-card');
@@ -1100,7 +1244,27 @@
       const s = p.xp_settings;
       setVal('xp__vr_separate_graphics_settings', s._vr_separate_graphics_settings ?? 1);
       setVal('xp_vr_renopt_tex_res_04', s.vr_renopt_tex_res_04 ?? s.renopt_tex_res_04 ?? 3);
-      setVal('win_windowed_for_vr', p.window_settings.windowed_for_vr ? 'true' : 'false');
+
+      if (p.window_settings) {
+        const ws = p.window_settings;
+        if (!ws.windowed_for_vr || ws.trainer_size === 'fullscreen' || ws.width >= 5120) {
+          setVal('win_trainer_size', 'fullscreen');
+        } else if (ws.trainer_size) {
+          setVal('win_trainer_size', ws.trainer_size);
+        } else {
+          const dimKey = `${ws.width}x${ws.height}`;
+          const known = ['2560x1440', '3440x1440', '1920x1080', '1280x720'];
+          if (known.includes(dimKey)) {
+            setVal('win_trainer_size', dimKey);
+          } else {
+            setVal('win_trainer_size', 'custom');
+            document.getElementById('win_custom_w').value = ws.width;
+            document.getElementById('win_custom_h').value = ws.height;
+          }
+        }
+        onTrainerSizeChange();
+      }
+
       setVal('xp_vr_renopt_FSR_04', s.vr_renopt_FSR_04 ?? s.renopt_FSR_04 ?? 0);
       setVal('xp__rcas_ratio', s._rcas_ratio ?? 0.75);
       setVal('xp__vr_vrs_enable', s._vr_vrs_enable ?? 0);
@@ -1149,9 +1313,10 @@
       document.getElementById('val_q_ppdp').textContent = ppdp.toFixed(2) + 'x';
       document.getElementById('val_q_bitrate_mbps').textContent = bitrate + 'M';
 
-      // Estimate VRAM out of 7.82 GB
+      // Estimate VRAM out of 15.8 GB
       const texRes = parseInt(document.getElementById('xp_vr_renopt_tex_res_04').value, 10);
-      const windowed = document.getElementById('win_windowed_for_vr').value === 'true';
+      const trainerSize = document.getElementById('win_trainer_size').value;
+      const isWindowed = trainerSize !== 'fullscreen';
       const fsr = parseInt(document.getElementById('xp_vr_renopt_FSR_04').value, 10);
       const staticAcf = parseInt(document.getElementById('xp_vr_renopt_static_acf').value, 10);
       const draw3d = parseInt(document.getElementById('xp_vr_renopt_draw_3d_04').value, 10);
@@ -1160,7 +1325,13 @@
 
       let vram = 3.1; // Base X-Plane 12 + OpenXR + Oculus Link runtime
       vram += [0.6, 0.9, 1.35, 2.0, 3.3][texRes] || 2.0;
-      if (!windowed) vram += 0.52;
+      if (!isWindowed) {
+        vram += 0.52;
+      } else if (trainerSize === '3440x1440' || trainerSize === '2560x1440') {
+        vram += 0.28;
+      } else {
+        vram += 0.12;
+      }
       if (staticAcf === 1) vram += 0.28;
       vram += draw3d * 0.14;
       vram *= (0.72 + 0.28 * (fovX * fovY * ppdp));
@@ -1225,7 +1396,26 @@
       const texRes = parseInt(document.getElementById('xp_vr_renopt_tex_res_04').value, 10);
       const veg3d = parseInt(document.getElementById('xp_vr_renopt_vegetation_3d').value, 10);
       const vrs = parseInt(document.getElementById('xp__vr_vrs_enable').value, 10);
-      const windowed = document.getElementById('win_windowed_for_vr').value === 'true';
+
+      const trainerSize = document.getElementById('win_trainer_size').value;
+      let isWindowed = true;
+      let winW = 2560;
+      let winH = 1440;
+
+      if (trainerSize === 'fullscreen') {
+        isWindowed = false;
+        winW = 5120;
+        winH = 2160;
+      } else if (trainerSize === 'custom') {
+        isWindowed = true;
+        winW = parseInt(document.getElementById('win_custom_w').value, 10) || 2560;
+        winH = parseInt(document.getElementById('win_custom_h').value, 10) || 1440;
+      } else {
+        isWindowed = true;
+        const parts = trainerSize.split('x');
+        winW = parseInt(parts[0], 10) || 2560;
+        winH = parseInt(parts[1], 10) || 1440;
+      }
 
       return {
         preset_id: selectedPresetId,
@@ -1255,9 +1445,10 @@
           vr_renopt_boats: 0,
         },
         window_settings: {
-          windowed_for_vr: windowed,
-          width: windowed ? 1280 : 5120,
-          height: windowed ? 720 : 2160,
+          windowed_for_vr: isWindowed,
+          width: winW,
+          height: winH,
+          trainer_size: trainerSize,
         },
         quest_settings: {
           fov_x: parseFloat(document.getElementById('q_fov_x').value),
@@ -1329,13 +1520,29 @@
       showToast(`🥽 Switched Quest Pro In-Headset Performance HUD to Mode ${mode}`);
     }
 
-    async function launchXPlane() {
+    async function launchSim(mode) {
+      if (mode === '2d') {
+        switchTargetMode('2d');
+      } else {
+        switchTargetMode('vr');
+      }
       await applySettings();
-      const res = await fetch('/api/launch_xp', { method: 'POST' });
+      showToast(mode === 'vr' 
+        ? '🥽 <strong>Starting VR Session...</strong><br/>Optimizing for Meta Quest Pro + OFXR-Bridge + XPME.'
+        : '🖥️ <strong>Starting 2D Ultrawide Session...</strong><br/>Optimizing for 5120×2160 Fullscreen + XPME.');
+      const res = await fetch('/api/launch_xp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: mode })
+      });
       const data = await res.json();
       if (data.ok) {
-        showToast(`🚀 <strong>Launching X-Plane 12 with Quest Pro + OFXR-Bridge!</strong><br/>Armed OFXR-Bridge 0.3.1 &amp; applied Quest Pro OpenXR settings.`);
+        showToast(`🚀 ${data.message}`);
       }
+    }
+
+    async function launchXPlane() {
+      await launchSim('vr');
     }
 
     async function openODT() {
