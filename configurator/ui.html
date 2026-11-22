@@ -362,9 +362,10 @@
   <header>
     <div class="brand">
       <h1>✈️ X-Plane 12 + Meta Quest Pro + OFXR-Bridge Configurator</h1>
-      <p>Default Headset: Meta Quest Pro (QLED + Local Dimming) • OFXR-Bridge 0.3.1 Optical Flow FrameGen • i9-9900K &amp; RTX 2070 (8 GB)</p>
+      <p>Target System: Meta Quest Pro (QLED + Local Dimming) • NVIDIA GeForce RTX 5070 Ti (16GB GDDR7) • OFXR-Bridge 0.3.1 FrameGen • XPME Photoreal Streaming</p>
     </div>
     <div class="header-actions">
+      <button class="btn-secondary" onclick="startXPME()" title="Check or start X-Plane Map Enhancement">🗺️ XPME Scenery</button>
       <button class="btn-secondary" onclick="openODT()">🛠 Open Oculus Debug Tool</button>
       <button class="btn-primary" onclick="applySettings()">💾 Apply &amp; Save Optimizations</button>
       <button class="btn-success" onclick="launchXPlane()">🚀 Launch X-Plane 12 VR</button>
@@ -381,8 +382,8 @@
       </div>
       <div class="stat-card">
         <div class="label">Graphics Processor &amp; Optical Flow</div>
-        <div class="val" id="hw-gpu">NVIDIA GeForce RTX 2070 (8 GB)</div>
-        <div class="sub">Vulkan 1.3.280 • Turing NVOFA Hardware Optical Flow • 7.82 GB Heap</div>
+        <div class="val" id="hw-gpu">NVIDIA GeForce RTX 5070 Ti (16 GB)</div>
+        <div class="sub" id="hw-gpu-sub">Vulkan 1.3 • Blackwell Optical Flow Engine • 15.8 GB Heap</div>
       </div>
       <div class="stat-card">
         <div class="label">Primary VR Headset (Default: Quest Pro)</div>
@@ -393,6 +394,11 @@
         <div class="label">OFXR-Bridge 0.3.1 Frame Generation</div>
         <div class="val" id="ofxr-title">OFXR-Bridge 0.3.1 (v681)</div>
         <div class="sub" id="ofxr-sub">Checking OpenXR &amp; Vulkan layer status...</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Photoreal Streaming (XPME)</div>
+        <div class="val" id="xpme-title">XPME Active (C:\XPME\base)</div>
+        <div class="sub" id="xpme-sub">North America Photoreal Tiles • Auto-Streaming Active</div>
       </div>
     </div>
 
@@ -406,11 +412,11 @@
     <div class="estimator-bar">
       <div class="meter-wrap">
         <div class="meter-head">
-          <span><strong>Estimated VR VRAM Load</strong> (RTX 2070 8GB Heap)</span>
-          <span id="vram-label">6.1 / 7.8 GB (Safe)</span>
+          <span id="vram-meter-title"><strong>Estimated VR VRAM Load</strong> (RTX 5070 Ti 16GB Heap)</span>
+          <span id="vram-label">6.5 / 15.8 GB (Safe Headroom)</span>
         </div>
         <div class="meter-track">
-          <div id="vram-bar" class="meter-fill" style="width: 75%; background: var(--success);"></div>
+          <div id="vram-bar" class="meter-fill" style="width: 42%; background: var(--success);"></div>
         </div>
       </div>
       <div class="meter-wrap">
@@ -437,9 +443,9 @@
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size: 0.8rem; color: var(--muted);">GPU Hardware:</span>
         <select id="gpu_filter" onchange="filterPresetsByGpu(this.value)" style="padding:4px 12px; background:#101726; border:1px solid #3b82f6; color:#60a5fa; font-weight:600; border-radius:6px; font-size:0.82rem; cursor:pointer;">
+          <option value="rtx_5070ti" selected>⚡ NVIDIA RTX 5070 Ti (16GB GDDR7) [Default]</option>
           <option value="all">🌐 All Profiles</option>
-          <option value="rtx_5070ti">⚡ NVIDIA RTX 5070 Ti (16GB GDDR7)</option>
-          <option value="rtx_2070">💻 NVIDIA RTX 2070 (8GB)</option>
+          <option value="rtx_2070">💻 Legacy RTX 2070 (8GB)</option>
         </select>
       </div>
     </div>
@@ -469,14 +475,14 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">VR Texture Quality (<code>vr_renopt_tex_res_04</code>)</div>
-            <div class="control-hint">High (3) or Medium (2) stops the 8GB VRAM overflow &amp; blurry 0.0625x gauge bug</div>
+            <div class="control-hint">Maximum (4) recommended for RTX 5070 Ti 16GB VRAM (uncompressed 4K cockpits)</div>
           </div>
           <div class="control-widget">
             <select id="xp_vr_renopt_tex_res_04" onchange="recalc()">
               <option value="1">Low (1) — ~4.8 GB VRAM</option>
-              <option value="2">Medium (2) — ~5.5 GB VRAM (Safest)</option>
-              <option value="3">High (3) — ~6.3 GB VRAM (Recommended)</option>
-              <option value="4">Maximum (4) — Overflow Risk on 8GB!</option>
+              <option value="2">Medium (2) — ~5.5 GB VRAM</option>
+              <option value="3">High (3) — ~6.3 GB VRAM</option>
+              <option value="4" selected>Maximum (4) — Uncompressed (Recommended for 16GB RTX 5070 Ti)</option>
             </select>
           </div>
         </div>
@@ -484,12 +490,12 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">2D Desktop Mirror Mode During VR</div>
-            <div class="control-hint">Running 1280×720 Windowed instead of 5120×2160 Fullscreen frees ~500 MB VRAM</div>
+            <div class="control-hint">Running 1280×720 Windowed saves GPU cycles for VR rendering and avoids monitor scaling</div>
           </div>
           <div class="control-widget">
             <select id="win_windowed_for_vr" onchange="recalc()">
-              <option value="true">1280×720 Windowed (Saves ~500MB VRAM)</option>
-              <option value="false">5120×2160 Fullscreen (High VRAM Cost)</option>
+              <option value="true">1280×720 Windowed (Recommended for VR)</option>
+              <option value="false">5120×2160 Fullscreen (High Desktop Overhead)</option>
             </select>
           </div>
         </div>
@@ -497,13 +503,13 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">AMD FidelityFX Super Resolution (<code>vr_renopt_FSR_04</code>)</div>
-            <div class="control-hint">Upscaling + RCAS sharpening relieves RTX 2070 pixel shader bottleneck</div>
+            <div class="control-hint">Off (0) recommended for RTX 5070 Ti 16GB (native razor-sharp instrument text)</div>
           </div>
           <div class="control-widget">
             <select id="xp_vr_renopt_FSR_04" onchange="recalc()">
-              <option value="0">Off — Full Native Resolution (0)</option>
-              <option value="1">Ultra Quality — 0.77x Scale (1) [Recommended]</option>
-              <option value="2">Quality — 0.67x Scale (2) [Max FPS]</option>
+              <option value="0" selected>Off — Full Native Resolution (0) [Recommended for 5070 Ti]</option>
+              <option value="1">Ultra Quality — 0.77x Scale (1)</option>
+              <option value="2">Quality — 0.67x Scale (2)</option>
               <option value="3">Balanced — 0.59x Scale (3)</option>
             </select>
           </div>
@@ -512,23 +518,23 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">CAS Cockpit Sharpening (<code>_rcas_ratio</code>)</div>
-            <div class="control-hint">0.55–0.65 restores crisp glass cockpit &amp; steam gauge text</div>
+            <div class="control-hint">0.75–0.80 restores razor-sharp glass cockpit &amp; steam gauge numbers</div>
           </div>
           <div class="control-widget">
-            <input type="range" id="xp__rcas_ratio" min="0" max="1" step="0.05" value="0.55" oninput="recalc()" />
-            <span class="range-val" id="val_xp__rcas_ratio">55%</span>
+            <input type="range" id="xp__rcas_ratio" min="0" max="1" step="0.05" value="0.80" oninput="recalc()" />
+            <span class="range-val" id="val_xp__rcas_ratio">80%</span>
           </div>
         </div>
 
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">Hardware Variable Rate Shading (<code>_vr_vrs_enable</code>)</div>
-            <div class="control-hint">Uses RTX 2070 Turing VRS to shade peripheral edges faster</div>
+            <div class="control-hint">Off (0) keeps panel gauges 100% 1x1 crisp across your peripheral glance</div>
           </div>
           <div class="control-widget">
             <select id="xp__vr_vrs_enable" onchange="recalc()">
+              <option value="0" selected>Disabled (0) — [Recommended for Cockpit Clarity]</option>
               <option value="1">Enabled — Max Foveated Preset (3)</option>
-              <option value="0">Disabled (0)</option>
             </select>
           </div>
         </div>
@@ -536,12 +542,12 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">Ambient Occlusion SSAO (<code>vr_renopt_SSAO_04</code>)</div>
-            <div class="control-hint">Very heavy in VR stereo rendering; Off (0) gains +12–15% GPU FPS</div>
+            <div class="control-hint">Low (1) adds subtle depth to cockpit switches; effortlessly handled by 5070 Ti</div>
           </div>
           <div class="control-widget">
             <select id="xp_vr_renopt_SSAO_04" onchange="recalc()">
-              <option value="0">Off (0) — Recommended for VR</option>
-              <option value="1">Low (1)</option>
+              <option value="1" selected>Low (1) — Recommended for 5070 Ti</option>
+              <option value="0">Off (0)</option>
               <option value="2">Medium (2)</option>
               <option value="3">High (3)</option>
             </select>
@@ -551,14 +557,14 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">Volumetric Cloud Quality (<code>vr_renopt_clouds_02</code>)</div>
-            <div class="control-hint">Medium (1) balances 3D cloud immersion and RTX 2070 ray-marching speed</div>
+            <div class="control-hint">High (2) or Maximum (3) delivers full 3D cloud immersion on RTX 5070 Ti 16GB</div>
           </div>
           <div class="control-widget">
             <select id="xp_vr_renopt_clouds_02" onchange="recalc()">
-              <option value="0">Low (0)</option>
-              <option value="1">Medium (1) — Recommended</option>
+              <option value="3" selected>Maximum (3) — [Ultra Realism]</option>
               <option value="2">High (2)</option>
-              <option value="3">Maximum (3)</option>
+              <option value="1">Medium (1)</option>
+              <option value="0">Low (0)</option>
             </select>
           </div>
         </div>
@@ -756,7 +762,7 @@
         <div class="control-row">
           <div class="control-info">
             <div class="control-name">Video Codec &amp; Sliced Encoding</div>
-            <div class="control-hint">H.264 + 5 Slices minimizes RTX 2070 Turing NVENC latency</div>
+            <div class="control-hint">H.264 + 5 Slices minimizes NVENC encoder/decoder latency across Meta Quest Link</div>
           </div>
           <div class="control-widget">
             <select id="q_video_codec">
@@ -792,7 +798,7 @@
           <div class="control-row">
             <div class="control-info">
               <div class="control-name">Optical Flow Engine / Route</div>
-              <div class="control-hint">RTX 2070 (Turing) supports hardware NVOFA Optical Flow + FidelityFX fallback</div>
+              <div class="control-hint">RTX 5070 Ti 16GB supports hardware Optical Flow with zero latency overhead</div>
             </div>
             <div class="control-widget">
               <select id="ofxr_backend" onchange="recalc()">
@@ -807,18 +813,18 @@
           <div class="control-row">
             <div class="control-info">
               <div class="control-name">Optical Flow Quality Preset &amp; Input Scale</div>
-              <div class="control-hint">Medium + 50% Flow Scale gives crisp motion vectors with minimal GPU time</div>
+              <div class="control-hint">Slow (0) + 100% Full Scale provides artifact-free vector interpolation on RTX 5070 Ti</div>
             </div>
             <div class="control-widget">
               <select id="ofxr_preset" onchange="recalc()" style="width: 48%;">
+                <option value="0" selected>Slow (Max Quality)</option>
                 <option value="1">Medium</option>
                 <option value="2">Fast</option>
-                <option value="0">Slow</option>
               </select>
               <select id="ofxr_scale" onchange="recalc()" style="width: 48%;">
-                <option value="2">50% Scale</option>
+                <option value="0" selected>100% Full Scale</option>
                 <option value="1">75% Scale</option>
-                <option value="0">100% Full</option>
+                <option value="2">50% Scale</option>
                 <option value="3">25% Scale</option>
               </select>
             </div>
@@ -827,12 +833,12 @@
           <div class="control-row">
             <div class="control-info">
               <div class="control-name">Fast Mode — Lower VRAM &amp; Single Swapchain Rings</div>
-              <div class="control-hint">CRITICAL for 8 GB RTX 2070: reduces synthesis swapchain VRAM footprint</div>
+              <div class="control-hint">Disabled (0) recommended for RTX 5070 Ti 16GB (full dual-ring optical flow buffers)</div>
             </div>
             <div class="control-widget">
               <select id="ofxr_lower_vram" onchange="recalc()">
-                <option value="1">Enabled (1) — Save VRAM on 8GB RTX 2070</option>
-                <option value="0">Disabled (0) — Double Synthesis Buffers</option>
+                <option value="0" selected>Disabled (0) — Full Dual-Ring Synthesis (Recommended for 5070 Ti)</option>
+                <option value="1">Enabled (1) — Lower-VRAM Mode (Legacy 8GB GPUs)</option>
               </select>
             </div>
           </div>
@@ -901,7 +907,8 @@
       renderDashboard();
     }
 
-        let currentGpuFilter = 'all';
+    let currentGpuFilter = 'rtx_5070ti';
+    let selectedPresetId = 'quest_pro_rtx5070ti_ultra';
 
     function filterPresetsByGpu(val) {
       currentGpuFilter = val;
@@ -944,7 +951,7 @@
             <div class="preset-desc">${p.description}</div>
           </div>
           <div style="font-size:0.76rem; color:var(--accent); font-weight:600;">
-            ${ofxrBadge} • FOV: ${p.quest_settings.fov_x}×${p.quest_settings.fov_y} • PPDP: ${p.quest_settings.ppdp}x • Link: ${p.quest_settings.bitrate_mbps || 325}Mbps
+            ${ofxrBadge} • FOV: ${p.quest_settings.fov_x}×${p.quest_settings.fov_y} • PPDP: ${p.quest_settings.ppdp}x • Link: ${p.quest_settings.bitrate_mbps || 500}Mbps
           </div>
         `;
         pContainer.appendChild(div);
@@ -957,6 +964,34 @@
       const xp = appState.xp_current;
       const ofxr = appState.ofxr_status || { tray_running: false, openxr_layer_armed: false, settings: {} };
 
+      if (appState.hardware) {
+        document.getElementById('hw-cpu').textContent = appState.hardware.cpu || 'Intel Core i9-9900K (8C/16T)';
+        document.getElementById('hw-ram').textContent = `${appState.hardware.ram || '64 GB RAM'} • Single-core optimized`;
+        document.getElementById('hw-gpu').textContent = appState.hardware.gpu || 'NVIDIA GeForce RTX 5070 Ti (16 GB)';
+        const gpuSub = document.getElementById('hw-gpu-sub');
+        if (gpuSub) {
+          gpuSub.textContent = `Vulkan 1.3 • Optical Flow Engine • ${appState.hardware.heap_gb || 15.8} GB Heap`;
+        }
+      }
+
+      if (appState.xpme_status) {
+        const xpme = appState.xpme_status;
+        const xTitle = document.getElementById('xpme-title');
+        const xSub = document.getElementById('xpme-sub');
+        if (xTitle && xSub) {
+          if (xpme.running) {
+            xTitle.innerHTML = '🟢 XPME Active (Streaming)';
+            xSub.innerHTML = `Base: <code>${xpme.base_path}</code> • ${xpme.server || 'Google Maps Free'} • AutoStart ON`;
+          } else if (xpme.installed) {
+            xTitle.innerHTML = '🟡 XPME Standby';
+            xSub.innerHTML = `Base: <code>${xpme.base_path}</code> • Auto-launches with VR`;
+          } else {
+            xTitle.innerHTML = '⚪ XPME Not Found';
+            xSub.innerHTML = `Install directory C:\\XPME not found`;
+          }
+        }
+      }
+
       document.getElementById('quest-title').textContent =
         `${q.model} (${q.connected ? 'Connected' : 'Default Profile Ready'})`;
       document.getElementById('quest-sub').textContent =
@@ -967,7 +1002,7 @@
         isArmed ? '🟢 OFXR-Bridge 0.3.1 Armed' : '⚪ OFXR-Bridge Disarmed';
       document.getElementById('ofxr-sub').textContent =
         isArmed
-          ? `OpenXR + Vulkan Layers Active • Lower-VRAM Fast Mode ON`
+          ? `OpenXR + Vulkan Layers Active • Dual-Ring Optical Flow ON`
           : `Using Native Meta Quest Link ASW`;
       document.getElementById('ofxr-flight-status').textContent =
         ofxr.last_flight_summary || 'Ready — waiting for X-Plane 12 VR session';
@@ -978,13 +1013,15 @@
       const list = document.getElementById('diag-items');
       const issues = [];
 
+      const is16Gb = currentGpuFilter === 'rtx_5070ti' || (appState.hardware && appState.hardware.vram_gb >= 12);
+
       if (xp._vr_separate_graphics_settings === 0) {
         issues.push('<strong>Separate VR Graphics Profile is OFF (<code>_vr_separate_graphics_settings 0</code>):</strong> X-Plane 12 was ignoring your VR settings and using your heavy 5K2K desktop settings inside VR.');
       }
-      if (log.vram_thrash_count > 0 && (xp._vr_separate_graphics_settings === 0 || xp.vr_renopt_tex_res_04 >= 4)) {
+      if (!is16Gb && log.vram_thrash_count > 0 && (xp._vr_separate_graphics_settings === 0 || xp.vr_renopt_tex_res_04 >= 4)) {
         issues.push(`<strong>Severe 8GB VRAM Exhaustion Detected in Log.txt (${log.vram_thrash_count} events):</strong> VRAM headroom dropped to <code>${log.min_headroom_mb} MB</code>, forcing X-Plane's Vulkan pager to downscale cockpit textures to <code>${log.min_texture_scale}x</code> (blurry instruments).`);
       }
-      if (xp.window_info && xp.window_info.mode === 'wmgr_mode_fullscreen' && xp.window_info.full_x >= 5120) {
+      if (!is16Gb && xp.window_info && xp.window_info.mode === 'wmgr_mode_fullscreen' && xp.window_info.full_x >= 5120) {
         issues.push('<strong>5120×2160 Fullscreen Desktop Swapchain Active:</strong> Allocating a 5K2K HDR desktop swapchain alongside Meta Quest Link wastes ~500 MB of your 8 GB VRAM during VR sessions.');
       }
 
@@ -994,11 +1031,18 @@
         list.innerHTML = issues.map(i => `<li>${i}</li>`).join('');
       } else {
         banner.className = 'diag-banner good';
-        heading.innerHTML = '✅ X-Plane 12 + Meta Quest Pro + OFXR-Bridge 0.3.1 Configured &amp; Ready!';
+        heading.innerHTML = is16Gb
+          ? '✅ X-Plane 12 + RTX 5070 Ti (16GB) + Quest Pro + OFXR-Bridge + XPME: Fully Optimized &amp; Ready!'
+          : '✅ X-Plane 12 + Meta Quest Pro + OFXR-Bridge 0.3.1 Configured &amp; Ready!';
+        const xpme = appState.xpme_status;
+        const xpmeLine = xpme && xpme.running
+          ? `<li><strong>Photoreal Scenery (XPME):</strong> 🟢 Photoreal streaming active from <code>${xpme.base_path}</code> (${xpme.server || 'Google Maps Free'})</li>`
+          : `<li><strong>Photoreal Scenery (XPME):</strong> 🟢 Base scenery configured in <code>${xpme ? xpme.base_path : 'C:\\XPME\\base'}</code> (Auto-starts on launch)</li>`;
         list.innerHTML = `
-          <li><strong>OFXR-Bridge 0.3.1 (v681):</strong> ${isArmed ? '🟢 Armed with NVIDIA Optical Flow + D3D11/Vulkan→D3D12 Session Bridge + Lower-VRAM Fast Mode' : '⚪ Disarmed (Meta Link ASW Active)'} — ${ofxr.last_flight_summary || ''}</li>
-          <li><strong>Cockpit Text Clarity:</strong> Dedicated VR profile (<code>1.25x PPDP</code>, <code>FSR Off</code>, <code>FXAA Off</code>, <code>75% CAS</code>, <code>Layer Mip-Bias ON</code>) with <code>1280×720 Windowed</code> desktop mirror.</li>
-          <li><strong>Golden Pre-OFXR Backup Saved:</strong> <code>GOLDEN_WORKING_PRE_OFXR_20261025_220314</code> is available below for instant 1-click rollback anytime.</li>
+          <li><strong>GPU &amp; VRAM Headroom:</strong> ${is16Gb ? '🟢 <strong>NVIDIA GeForce RTX 5070 Ti (16 GB GDDR7)</strong> — Maximum Uncompressed Textures (4) running with >8 GB free VRAM headroom' : 'RTX 2070 8GB — High Textures (3)'}</li>
+          <li><strong>OFXR-Bridge 0.3.1 (v681):</strong> ${isArmed ? '🟢 Armed with NVIDIA Optical Flow 2X FrameGen + D3D11/Vulkan→D3D12 Session Bridge' : '⚪ Disarmed (Meta Link ASW Active)'} — ${ofxr.last_flight_summary || 'Ready for VR flight'}</li>
+          <li><strong>Cockpit Text Clarity:</strong> Dedicated VR profile (<code>1.30x PPDP</code>, <code>FSR Off</code>, <code>FXAA Off</code>, <code>80% CAS</code>, <code>Layer Mip-Bias ON</code>) with <code>1280×720 Windowed</code> desktop mirror.</li>
+          ${xpmeLine}
         `;
       }
 
@@ -1022,7 +1066,7 @@
       if (q.last_cli && q.last_cli.preset_id && appState.presets[q.last_cli.preset_id]) {
         selectedPresetId = q.last_cli.preset_id;
       } else {
-        selectedPresetId = appState.default_preset_id || 'quest_pro_sharp_text';
+        selectedPresetId = appState.default_preset_id || 'quest_pro_rtx5070ti_ultra';
       }
       selectPreset(selectedPresetId);
     }
@@ -1125,21 +1169,28 @@
         vram += ofxrLowVram ? 0.55 : 0.70;
       }
 
-      const maxHeap = 7.82;
+      const is5070 = currentGpuFilter === 'rtx_5070ti' || (appState && appState.hardware && appState.hardware.vram_gb >= 12);
+      const maxHeap = is5070 ? ((appState && appState.hardware && appState.hardware.heap_gb) || 15.8) : 7.82;
       const pct = Math.min(100, Math.round((vram / maxHeap) * 100));
       const vBar = document.getElementById('vram-bar');
       vBar.style.width = pct + '%';
       let statusTxt = 'Safe Headroom';
-      if (vram > 7.35) {
+      const dangerThreshold = is5070 ? 14.5 : 7.35;
+      const tightThreshold = is5070 ? 13.0 : 6.65;
+      if (vram > dangerThreshold) {
         vBar.style.background = 'var(--danger)';
         statusTxt = 'Overflow Risk!';
-      } else if (vram > 6.65) {
+      } else if (vram > tightThreshold) {
         vBar.style.background = 'var(--warn)';
         statusTxt = 'Tight';
       } else {
         vBar.style.background = 'var(--success)';
       }
       document.getElementById('vram-label').textContent = `${vram.toFixed(2)} / ${maxHeap} GB (${statusTxt})`;
+      const vTitle = document.getElementById('vram-meter-title');
+      if (vTitle) {
+        vTitle.innerHTML = `<strong>Estimated VR VRAM Load</strong> (${is5070 ? 'RTX 5070 Ti 16GB Heap' : 'RTX 2070 8GB Heap'})`;
+      }
 
       // Estimate Effective Shaded Resolution per eye
       const fsrScaleMap = { 0: 1.0, 1: 0.77, 2: 0.67, 3: 0.59 };
@@ -1313,6 +1364,17 @@
       };
       if (data.ok) {
         showToast(`👁️ OFXR Overlay set to <strong>${labels[pos] || pos}</strong> (applies live in headset)`);
+      }
+    }
+
+    async function startXPME() {
+      try {
+        const res = await fetch('/api/xpme/start', { method: 'POST' });
+        const data = await res.json();
+        showToast(data.ok ? `🗺️ <strong>XPME Scenery:</strong> ${data.message}` : `⚠️ ${data.message}`);
+        await loadStatus();
+      } catch (e) {
+        showToast(`⚠️ Error contacting XPME: ${e}`);
       }
     }
 

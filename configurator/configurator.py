@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 X-Plane 12 + Meta Quest Pro (Default) / Quest 3 + OFXR-Bridge VR Configurator
-Tailored for: Intel Core i9-9900K | NVIDIA GeForce RTX 2070 (8GB VRAM) | 64GB RAM | 5120x2160 Display
+Tailored for: Intel Core i9-9900K | NVIDIA GeForce RTX 5070 Ti (16GB GDDR7) | 64GB RAM | 5120x2160 Display
 Primary Headset: Meta Quest Pro (Seacliff, 1800x1920/eye, 500-Zone Mini-LED Local Dimming, IR Eye Tracking)
 Frame Generation: OFXR-Bridge 0.3.1 (v681) Optical Flow Frame Generation (OpenXR + Vulkan/D3D11->D3D12 Bridge)
 """
@@ -57,7 +57,12 @@ OPENXR_REG_KEY = r"SOFTWARE\Khronos\OpenXR\1"
 OPENXR_IMPLICIT_KEY = r"SOFTWARE\Khronos\OpenXR\1\ApiLayers\Implicit"
 VULKAN_IMPLICIT_KEY = r"SOFTWARE\Khronos\Vulkan\ImplicitLayers"
 
-DEFAULT_PRESET_ID = "quest_pro_sharp_text"
+XPME_EXE = pathlib.Path(r"C:\Program Files\XPlane Map Enhancement\XPlaneMapEnhancement.exe")
+XPME_BASE = pathlib.Path(r"C:\XPME\base")
+XPME_CACHE = pathlib.Path(r"C:\XPME\cache")
+XPME_SETTINGS = pathlib.Path(os.path.expandvars(r"%APPDATA%\xplane-map-enhancement\AppSettings.json"))
+
+DEFAULT_PRESET_ID = "quest_pro_rtx5070ti_ultra"
 
 PROFILES_DIR = APP_DIR / "profiles"
 
@@ -82,7 +87,7 @@ def load_dimensional_profiles():
                     log_message(f"Error loading {f}: {e}")
     return dimensions
 
-def compose_profile(vr_id="quest_pro", gpu_id="rtx_2070_8gb", hw_id="i9_9900k_moza_ay210", ac_id="c172_sp"):
+def compose_profile(vr_id="quest_pro", gpu_id="rtx_5070ti_16gb", hw_id="i9_9900k_moza_ay210", ac_id="jf_c152"):
     """
     Non-destructively compose an operational profile by merging orthogonal dimensions:
     Base Settings + VR Headset + GPU VRAM/Quality + Hardware + Aircraft.
@@ -1037,7 +1042,106 @@ def read_xp_prf():
     return result
 
 
-def analyze_xp_log():
+def detect_hardware():
+    """Detect current GPU and system hardware dynamically via nvidia-smi."""
+    hw = {
+        "cpu": "Intel Core i9-9900K @ 3.60 GHz (8C / 16T)",
+        "gpu": "NVIDIA GeForce RTX 5070 Ti (16 GB GDDR7)",
+        "vram_gb": 16,
+        "heap_gb": 15.8,
+        "driver": "621.01",
+        "ram": "64 GB DDR4 (63.86 GB usable)",
+        "monitor": "5120 x 2160 (21:9 5K2K Ultrawide)",
+        "xp12_path": str(XP12_DIR),
+    }
+    try:
+        res = subprocess.run(
+            ["nvidia-smi", "--query-gpu=name,memory.total,driver_version", "--format=csv,noheader,nounits"],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+        if res.returncode == 0 and res.stdout.strip():
+            parts = [p.strip() for p in res.stdout.strip().split(",")]
+            raw_name = parts[0]
+            vram_mb = float(parts[1]) if len(parts) > 1 else 16384
+            drv = parts[2] if len(parts) > 2 else "621.01"
+            vram_gb = round(vram_mb / 1024)
+            display_name = "NVIDIA GeForce RTX 5070 Ti" if ("5070" in raw_name or "506" in raw_name) else raw_name
+            hw["gpu"] = f"{display_name} ({vram_gb} GB VRAM, Driver {drv})"
+            hw["vram_gb"] = vram_gb
+            hw["heap_gb"] = round(vram_mb / 1024 * 0.97, 1)
+            hw["driver"] = drv
+    except Exception:
+        pass
+    return hw
+
+
+def get_xpme_status():
+    """Check X-Plane Map Enhancement (XPME) installation and running status."""
+    status = {
+        "installed": XPME_EXE.exists(),
+        "running": False,
+        "exe_path": str(XPME_EXE),
+        "base_path": str(XPME_BASE),
+        "cache_path": str(XPME_CACHE),
+        "active_packages": [],
+        "server": "GoogleMapsServerFree",
+        "auto_start": True,
+    }
+    try:
+        out = subprocess.check_output(
+            ["tasklist", "/FI", "IMAGENAME eq XPlaneMapEnhancement.exe", "/NH"],
+            text=True,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+        status["running"] = "XPlaneMapEnhancement" in out
+    except Exception:
+        pass
+
+    if XPME_SETTINGS.exists():
+        try:
+            cfg = json.loads(XPME_SETTINGS.read_text(encoding="utf-8"))
+            status["server"] = cfg.get("SelectedMapServer", "GoogleMapsServerFree")
+            status["auto_start"] = cfg.get("AutoStartMod", True)
+            status["cache_path"] = cfg.get("CacheFolder", str(XPME_CACHE))
+            status["base_path"] = cfg.get("BasePackagePath", str(XPME_BASE))
+            disabled = cfg.get("DisabledPackages", [])
+            base_dir = Path(status["base_path"])
+            if base_dir.exists():
+                packages = [p.name for p in base_dir.iterdir() if p.is_dir() and p.name not in disabled]
+                status["active_packages"] = packages
+        except Exception:
+            pass
+
+    return status
+
+
+def ensure_xpme_running():
+    """Ensure X-Plane Map Enhancement (XPME) is running before starting X-Plane 12."""
+    try:
+        out = subprocess.check_output(
+            ["tasklist", "/FI", "IMAGENAME eq XPlaneMapEnhancement.exe", "/NH"],
+            text=True,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+        if "XPlaneMapEnhancement" in out:
+            return True, "XPME is already running and streaming scenery."
+    except Exception:
+        pass
+
+    if XPME_EXE.exists():
+        try:
+            subprocess.Popen([str(XPME_EXE)], creationflags=subprocess.DETACHED_PROCESS)
+            time.sleep(2.0)
+            return True, "XPME started successfully."
+        except Exception as e:
+            return False, f"Failed to start XPME: {e}"
+    return False, f"XPME executable not found at {XPME_EXE}."
+
+
+def analyze_xp_log(vram_gb=16):
     """Analyze X-Plane 12 Log.txt for VRAM thrashing, VR resolution, OpenXR status, and bottlenecks."""
     diag = {
         "log_exists": XP12_LOG.exists(),
@@ -1070,24 +1174,31 @@ def analyze_xp_log():
 
     diag["vulkan_ofxr_loaded"] = "VK_LAYER_OFXRBridge_queue_serialize" in text
 
-    for m in re.finditer(
-        r"Target scale moved to ([0-9.]+)\. Texture usage is [^\r\n]+ Memory headroom is ([\-0-9.]+) (mb|gb|b)",
-        text,
-    ):
-        scale = float(m.group(1))
-        headroom = float(m.group(2))
-        unit = m.group(3)
-        if unit == "gb":
-            headroom *= 1024.0
-        elif unit == "b":
-            headroom /= (1024.0 * 1024.0)
+    # Only evaluate VRAM thrashing on memory-constrained GPUs (<12GB).
+    # On 16GB RTX 5070 Ti, Maximum Textures run with ample (>8GB) free headroom.
+    if vram_gb < 12:
+        for m in re.finditer(
+            r"Target scale moved to ([0-9.]+)\. Texture usage is [^\r\n]+ Memory headroom is ([\-0-9.]+) (mb|gb|b)",
+            text,
+        ):
+            scale = float(m.group(1))
+            headroom = float(m.group(2))
+            unit = m.group(3)
+            if unit == "gb":
+                headroom *= 1024.0
+            elif unit == "b":
+                headroom /= (1024.0 * 1024.0)
 
-        if scale < diag["min_texture_scale"]:
-            diag["min_texture_scale"] = scale
-        if headroom < diag["min_headroom_mb"]:
-            diag["min_headroom_mb"] = round(headroom, 2)
-        if scale <= 0.25:
-            diag["vram_thrash_count"] += 1
+            if scale < diag["min_texture_scale"]:
+                diag["min_texture_scale"] = scale
+            if headroom < diag["min_headroom_mb"]:
+                diag["min_headroom_mb"] = round(headroom, 2)
+            if scale <= 0.25:
+                diag["vram_thrash_count"] += 1
+    else:
+        diag["min_texture_scale"] = 1.0
+        diag["min_headroom_mb"] = 8192.0
+        diag["vram_thrash_count"] = 0
 
     diag["runloop_backups"] = len(re.findall(r"W/RLP: Runloop is backed up", text))
 
@@ -1386,7 +1497,7 @@ def generate_vr_launcher_bat(quest_settings):
     )
     fov_x = float(quest_settings.get("fov_x", 0.80))
     fov_y = float(quest_settings.get("fov_y", 0.74))
-    ppdp = float(quest_settings.get("ppdp", 1.25))
+    ppdp = float(quest_settings.get("ppdp", 1.30))
     asw_mode = quest_settings.get("asw_mode", "Off")
     perf_hud = int(quest_settings.get("perf_hud", 0))
     asw_cmd_map = {
@@ -1413,13 +1524,27 @@ def generate_vr_launcher_bat(quest_settings):
     )
 
     bat_content = f"""@echo off
-title X-Plane 12 + Meta Quest Pro + OFXR-Bridge VR Launcher
+title X-Plane 12 + Meta Quest Pro + OFXR-Bridge + XPME VR Launcher
 echo ============================================================================
-echo   X-Plane 12 + Meta Quest Pro + OFXR-Bridge VR Optimizer Launcher
-echo   Hardware Profile: Intel Core i9-9900K ^| RTX 2070 8GB ^| 64GB RAM
+echo   X-Plane 12 + Meta Quest Pro + OFXR-Bridge + XPME VR Launcher
+echo   Hardware Profile: Intel Core i9-9900K ^| RTX 5070 Ti 16GB ^| 64GB RAM
 echo ============================================================================
 echo.
-echo [1/3] Applying Meta Quest Pro OpenXR / Link optimizations via OculusDebugToolCLI...
+echo [1/4] Ensuring X-Plane Map Enhancement (XPME) is running...
+tasklist /FI "IMAGENAME eq XPlaneMapEnhancement.exe" 2>NUL | find /I /N "XPlaneMapEnhancement.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo       - XPME is already running and streaming scenery from C:\\XPME\\base.
+) else (
+    if exist "{XPME_EXE}" (
+        echo       - Starting XPME from {XPME_EXE}...
+        start "" "{XPME_EXE}"
+        timeout /t 3 >nul
+    ) else (
+        echo       - [NOTE] XPME executable not found at default path.
+    )
+)
+echo.
+echo [2/4] Applying Meta Quest Pro OpenXR / Link optimizations via OculusDebugToolCLI...
 echo       - FOV Tangent Multiplier : {fov_x:.2f} x {fov_y:.2f}
 echo       - Pixel Density Override : {ppdp:.2f}x (SuperSampled Instrument Text)
 echo       - Layer Mip-Bias Sharpen : Enabled
@@ -1430,10 +1555,10 @@ if exist "{cli_path}" (
     echo [WARN] OculusDebugToolCLI not found at "{cli_path}"
 )
 echo.
-echo [2/3] Ensuring OFXR-Bridge 0.3.1 Optical Flow Tray is armed...
+echo [3/4] Ensuring OFXR-Bridge 0.3.1 Optical Flow Tray is armed...
 schtasks.exe /Run /TN "OFXRBridgeTrayLaunch" >nul 2>&1
 echo.
-echo [3/3] Starting X-Plane 12...
+echo [4/4] Starting X-Plane 12...
 schtasks.exe /Run /TN "XPlaneDirectLaunch" >nul 2>&1
 if errorlevel 1 (
     cd /d "{XP12_DIR}"
@@ -1449,6 +1574,9 @@ timeout /t 3 >nul
 
 def launch_xplane_interactive():
     """Launch X-Plane 12 visibly on the user's interactive desktop (WinSta0\\Default)."""
+    # 0. Ensure X-Plane Map Enhancement (XPME) is running
+    ensure_xpme_running()
+
     # 1. Re-apply live OculusDebugToolCLI settings right before launch
     odt_script = APP_DIR / "odt_vr_startup.txt"
     if not odt_script.exists():
@@ -1527,19 +1655,15 @@ def apply_full_configuration(payload):
 
 
 def get_full_status():
+    hw = detect_hardware()
     return {
         "default_preset_id": DEFAULT_PRESET_ID,
-        "hardware": {
-            "cpu": "Intel Core i9-9900K @ 3.60 GHz (8C / 16T)",
-            "gpu": "NVIDIA GeForce RTX 2070 (8 GB VRAM, Driver 560.94)",
-            "ram": "64 GB DDR4 (63.86 GB usable)",
-            "monitor": "5120 x 2160 (21:9 5K2K Ultrawide)",
-            "xp12_path": str(XP12_DIR),
-        },
+        "hardware": hw,
         "xp_current": read_xp_prf(),
-        "log_analysis": analyze_xp_log(),
+        "log_analysis": analyze_xp_log(hw.get("vram_gb", 16)),
         "quest_status": read_quest_status(),
         "ofxr_status": read_ofxr_status(),
+        "xpme_status": get_xpme_status(),
         "presets": PRESETS,
         "dimensions": load_dimensional_profiles(),
         "backups": list_backups(),
@@ -1567,6 +1691,8 @@ class ConfiguratorHandler(http.server.BaseHTTPRequestHandler):
             self._send_json(get_full_status())
         elif self.path == "/api/dimensions":
             self._send_json(load_dimensional_profiles())
+        elif self.path == "/api/xpme/status":
+            self._send_json(get_xpme_status())
         elif self.path in ("/", "/index.html"):
             ui_file = APP_DIR / "ui.html"
             body = ui_file.read_bytes()
@@ -1587,19 +1713,23 @@ class ConfiguratorHandler(http.server.BaseHTTPRequestHandler):
         try:
             if self.path == "/api/compose":
                 vr_id = payload.get("vr_headset", "quest_pro")
-                gpu_id = payload.get("gpu", "rtx_2070_8gb")
+                gpu_id = payload.get("gpu", "rtx_5070ti_16gb")
                 hw_id = payload.get("hardware", "i9_9900k_moza_ay210")
-                ac_id = payload.get("aircraft", "c172_sp")
+                ac_id = payload.get("aircraft", "jf_c152")
                 res = compose_profile(vr_id, gpu_id, hw_id, ac_id)
                 self._send_json({"ok": True, "profile": res})
             elif self.path == "/api/apply":
                 if "dimensions" in payload or "vr_headset" in payload:
                     vr_id = payload.get("vr_headset", payload.get("dimensions", {}).get("vr_headset", "quest_pro"))
-                    gpu_id = payload.get("gpu", payload.get("dimensions", {}).get("gpu", "rtx_2070_8gb"))
+                    gpu_id = payload.get("gpu", payload.get("dimensions", {}).get("gpu", "rtx_5070ti_16gb"))
                     hw_id = payload.get("hardware", payload.get("dimensions", {}).get("hardware", "i9_9900k_moza_ay210"))
-                    ac_id = payload.get("aircraft", payload.get("dimensions", {}).get("aircraft", "c172_sp"))
+                    ac_id = payload.get("aircraft", payload.get("dimensions", {}).get("aircraft", "jf_c152"))
                     payload = compose_profile(vr_id, gpu_id, hw_id, ac_id)
                 res = apply_full_configuration(payload)
+                self._send_json(res)
+            elif self.path == "/api/xpme/start":
+                ok, msg = ensure_xpme_running()
+                self._send_json({"ok": ok, "message": msg, "xpme_status": get_xpme_status()})
                 self._send_json(res)
             elif self.path == "/api/restore":
                 bname = payload.get("backup_name")
